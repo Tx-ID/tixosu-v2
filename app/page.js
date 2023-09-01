@@ -1,8 +1,11 @@
+'use client'
+
+import Link from "next/link"
 
 export default function Home() {
   return (
-    <div className="ml-2 mt-2">
-      You found me!
+    <div className="mx-2 flex flex-col items-start">
+      <a href="/callback">request Cookie</a>
     </div>
   )
 }

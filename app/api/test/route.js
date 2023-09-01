@@ -1,6 +1,6 @@
 
-export async function GET(req, res) {
-    return new Response("hello!", {
-        status: 200,
-    })
+import { NextResponse } from 'next/server'
+
+export async function GET(request) {
+    return NextResponse.json({message: "success!"})
 }

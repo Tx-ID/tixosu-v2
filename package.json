@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env URL=http://localhost:3000 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -11,6 +11,9 @@
   "dependencies": {
     "@fontsource/metropolis": "^5.0.7",
     "autoprefixer": "10.4.15",
+    "axios": "^1.5.0",
+    "cookie": "^0.5.0",
+    "cross-env": "^7.0.3",
     "next": "13.4.19",
     "postcss": "8.4.29",
     "react": "18.2.0",
