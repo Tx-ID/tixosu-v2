@@ -2,7 +2,7 @@
 export default function Home() {
   return (
     <div className="ml-2 mt-2">
-      You found me!
+      You found me in about!
     </div>
   )
 }

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fontsource/metropolis": "^5.0.7",
     "autoprefixer": "10.4.15",
     "next": "13.4.19",
     "postcss": "8.4.29",
