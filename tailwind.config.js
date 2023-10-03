@@ -10,9 +10,10 @@ module.exports = {
     extend: {
       backgroundImage: {},
       colors: {
+        ...require('tailwindcss/colors'),
         primary: '#F65670',
       },
     },
   },
-  plugins: [],
+  plugins: [require('daisyui')],
 }

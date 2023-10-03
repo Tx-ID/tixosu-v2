@@ -1,6 +1,8 @@
 import './globals.css'
 import Navbar from './navbar.js'
-import "@fontsource/metropolis";
+
+import { Lexend } from 'next/font/google'
+const lexend = Lexend({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Rest of Indonesia Tournament',
@@ -10,7 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="min-h-screen max-w-screen-md m-auto">
+      <body className={"min-h-screen max-w-screen-md m-auto " + lexend.className}>
         <Navbar />
         {children}
       </body>
