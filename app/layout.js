@@ -9,7 +9,7 @@ export const metadata = {
   description: 'Host is stupid.',
 }
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children, session }) {
   return (
     <html lang="en">
       <body className={"min-h-screen max-w-screen-md m-auto " + lexend.className}>
