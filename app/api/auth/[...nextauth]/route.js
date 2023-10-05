@@ -1,13 +1,5 @@
-import NextAuth from "next-auth"
-import osuProvider from 'next-auth/providers/osu'
+import * as auth from '@/lib/auth.js'
+import NextAuth from 'next-auth'
 
-const handler = NextAuth({
-    providers: [
-        osuProvider({
-            clientId: process.env.OSU_CLIENT_ID,
-            clientSecret: process.env.OSU_CLIENT_SECRET,
-        }),
-    ],
-})
-
+const handler = NextAuth(auth.config);
 export { handler as GET, handler as POST }
