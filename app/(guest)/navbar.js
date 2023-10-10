@@ -42,7 +42,7 @@ export default function navbar() {
                     </summary>
                     <ul tabIndex={0} className="dropdown-content mt-2 z-[1] menu p-2 shadow bg-base-100 rounded-lg w-52">
                         {pages.map((pageData, index) => (
-                            <li><Link onClick={() => { goToPage(pageData[1]) }} href={pageData[1]} key={index} className='hover:text-primary'><p className={'' + (pageData[1] == page ? "text-primary hover:text-primary" : "")}>{pageData[0]}</p></Link></li>
+                            <li key={index}><Link onClick={() => { goToPage(pageData[1]) }} href={pageData[1]} key={index} className='hover:text-primary'><p className={'' + (pageData[1] == page ? "text-primary hover:text-primary" : "")}>{pageData[0]}</p></Link></li>
                         ))}
                     </ul>
                 </details>
