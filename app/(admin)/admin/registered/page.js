@@ -5,6 +5,6 @@ import { redirect } from "next/navigation"
 
 export default function page() {
     return (
-        <div>This is sheets</div>
+        <div>This is registered players</div>
     )
 }
