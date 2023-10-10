@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 export default function navbar() {
     const [page, setPage] = useState(null);
-    const router = useRouter();
+    const session = useSession();
 
     useEffect(() => {
         const pathname = window.location.pathname;
@@ -29,9 +29,15 @@ export default function navbar() {
                         md:rounded-0">
             <img className="h-16" src="https://cdn.discordapp.com/attachments/928180368425754674/1147075298131726488/roipro.png" alt="Rest of Indonesia Tournament" />
             <div className="flex-wrap hidden md:flex">
-                {pages.map((pageData, index) => (
-                    <Link onClick={() => { goToPage(pageData[1]) }} href={pageData[1]} key={index} className={'ml-3 transition-colors duration-150 ' + (pageData[1] == page ? "text-primary" : "hover:text-primary")}><p>{pageData[0]}</p></Link>
-                ))}
+                {pages.map((pageData, index) => {
+                    return <Link onClick={() => { goToPage(pageData[1]) }} href={pageData[1]} key={index} className={'ml-3 transition-colors duration-150 ' + (pageData[1] == page ? "text-primary" : "hover:text-primary")}><p>{pageData[0]}</p></Link>
+                })}
+                {session.status == "loading" || session.status == "unauthenticated" ? "" :
+                    !session.data.user.is_admin ? "" :
+                        <Link onClick={() => { goToPage("/admin") }} href={"/admin"} key={pages.length + 1} className={'ml-3 transition-colors duration-150 ' + ("/admin" == page ? "text-primary" : "hover:text-primary")}>
+                            <p>{"Admin"}</p>
+                        </Link>
+                }
             </div>
             <div className='md:hidden'>
                 <details className="dropdown dropdown-end">
@@ -42,8 +48,22 @@ export default function navbar() {
                     </summary>
                     <ul tabIndex={0} className="dropdown-content mt-2 z-[1] menu p-2 shadow bg-base-100 rounded-lg w-52">
                         {pages.map((pageData, index) => (
-                            <li key={index}><Link onClick={() => { goToPage(pageData[1]) }} href={pageData[1]} key={index} className='hover:text-primary'><p className={'' + (pageData[1] == page ? "text-primary hover:text-primary" : "")}>{pageData[0]}</p></Link></li>
+                            <li key={index}>
+                                <Link onClick={() => { goToPage(pageData[1]) }} href={pageData[1]} key={index} className={'hover:text-primary'}>
+                                    <p className={'' + (pageData[1] == page ? "text-primary hover:text-primary" : "")}>
+                                        {pageData[0]}
+                                    </p>
+                                </Link>
+                            </li>
                         ))}
+                        {session.status == "loading" || session.status == "unauthenticated" ? "" :
+                            !session.data.user.is_admin ? "" :
+                                <li key={pages.length + 1}>
+                                    <Link onClick={() => { goToPage("/admin") }} href={"/admin"} key={pages.length + 1} className={'transition-colors duration-150 ' + ("/admin" == page ? "text-primary" : "hover:text-primary")}>
+                                        <p>{"Admin"}</p>
+                                    </Link>
+                                </li>
+                        }
                     </ul>
                 </details>
             </div>

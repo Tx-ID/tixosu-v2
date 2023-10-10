@@ -1,7 +1,14 @@
 'use client'
 
-import { redirect } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 export default function page() {
-    redirect("/admin/sheets")
+    const session = useSession();
+
+    return (
+        <div>
+            <div className="mb-4">This is authorization.</div>
+            {session.status == "loading" ? <>loading...</> : <>{JSON.stringify(session, null, 2)}</>}
+        </div>
+    )
 }
