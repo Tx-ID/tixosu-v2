@@ -38,7 +38,7 @@ CREATE TABLE `match` (
     `red_points` FLOAT DEFAULT NULL,
     `blue_points` FLOAT DEFAULT NULL,
     `streamer` TEXT DEFAULT NULL,
-    `mp_link` TEXT DEFAULT NULL,
+    `mp_link` TEXT DEFAULT NULL
 );
 
 CREATE TABLE `match_commentator` (
