@@ -2,8 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import { useSession } from "next-auth/react"
-import { redirect } from "next/navigation"
 
 export default function page() {
 
@@ -33,7 +31,10 @@ export default function page() {
                                 Player
                             </td>
                             <td>
-                                Hello
+                                Pic
+                            </td>
+                            <td>
+                                Country
                             </td>
                         </tr>
                     </thead>
@@ -45,6 +46,9 @@ export default function page() {
                                 </td>
                                 <td>
                                     <img src={player.avatar_url} />
+                                </td>
+                                <td>
+                                    {player.country_code}
                                 </td>
                             </tr>
                         )) }
