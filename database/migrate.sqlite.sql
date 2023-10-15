@@ -1,3 +1,8 @@
+CREATE TABLE `access_token` (
+    `token` TEXT PRIMARY KEY,
+    `expires_on` DATETIME NOT NULL
+);
+
 CREATE TABLE `environment` (
     `name` TEXT PRIMARY KEY,
     `active` BOOLEAN NOT NULL
@@ -9,7 +14,7 @@ CREATE TABLE `admin` (
 
 CREATE TABLE `participant` (
     `osu_id` INTEGER PRIMARY KEY,
-    `team_id` INTEGER NOT NULL
+    `team_id` INTEGER
 );
 
 CREATE TABLE `team` (
