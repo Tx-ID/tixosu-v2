@@ -78,3 +78,21 @@ CREATE TABLE `map_pool_beatmaps` (
     `beatmap_id` INTEGER,
     PRIMARY KEY (`pool_id`, `beatmap_id`)
 );
+
+CREATE TABLE `cache_osu_user` (
+    `last_fetched` TEXT NOT NULL,
+    `osu_id` INTEGER PRIMARY KEY,
+    `username` TEXT NOT NULL,
+    `avatar_url` TEXT NOT NULL,
+    `country_code` TEXT NOT NULL
+);
+
+CREATE TABLE `cache_osu_beatmap` (
+    `last_fetched` TEXT NOT NULL,
+    `beatmap_id` INTEGER PRIMARY KEY,
+    `difficulty_rating` REAL NOT NULL,
+    `status` TEXT NOT NULL,
+    `total_length` INTEGER NOT NULL,
+    `user_id` INTEGER NOT NULL,
+    `version` TEXT NOT NULL
+);
