@@ -1,6 +1,6 @@
 CREATE TABLE `access_token` (
     `token` TEXT PRIMARY KEY,
-    `expires_on` DATETIME NOT NULL
+    `expires_on` TEXT NOT NULL
 );
 
 CREATE TABLE `environment` (
@@ -25,7 +25,7 @@ CREATE TABLE `team` (
 CREATE TABLE `round` (
     `order` INTEGER PRIMARY KEY,
     `name` TEXT NOT NULL,
-    `date` DATETIME NOT NULL,
+    `date` TEXT NOT NULL,
     `best_of` INTEGER NOT NULL
 );
 
@@ -34,14 +34,14 @@ CREATE TABLE `match` (
     `round_id` INTEGER NOT NULL,
     `red_team_id` INTEGER NOT NULL,
     `blue_team_id` INTEGER NOT NULL,
-    `date` DATETIME NOT NULL,
+    `date` TEXT NOT NULL,
     `referee` TEXT NOT NULL,
     -- Added after row creation
     `roll_winner` TEXT DEFAULT NULL, -- ENUM(RED, BLUE)
     `first_pick` TEXT DEFAULT NULL, -- ENUM(RED, BLUE)
     `first_ban` TEXT DEFAULT NULL, -- ENUM(RED, BLUE)
-    `red_points` FLOAT DEFAULT NULL,
-    `blue_points` FLOAT DEFAULT NULL,
+    `red_points` INTEGER DEFAULT NULL,
+    `blue_points` INTEGER DEFAULT NULL,
     `streamer` TEXT DEFAULT NULL,
     `mp_link` TEXT DEFAULT NULL
 );
@@ -68,31 +68,8 @@ CREATE TABLE `match_ban` (
     PRIMARY KEY (`number`, `match_id`)
 );
 
-CREATE TABLE `map_pool` (
-    `id` INTEGER PRIMARY KEY,
-    `name` TEXT
-);
-
-CREATE TABLE `map_pool_beatmaps` (
-    `pool_id` INTEGER,
+CREATE TABLE `round_beatmap` (
+    `round_id` INTEGER,
     `beatmap_id` INTEGER,
-    PRIMARY KEY (`pool_id`, `beatmap_id`)
-);
-
-CREATE TABLE `cache_osu_user` (
-    `last_fetched` TEXT NOT NULL,
-    `osu_id` INTEGER PRIMARY KEY,
-    `username` TEXT NOT NULL,
-    `avatar_url` TEXT NOT NULL,
-    `country_code` TEXT NOT NULL
-);
-
-CREATE TABLE `cache_osu_beatmap` (
-    `last_fetched` TEXT NOT NULL,
-    `beatmap_id` INTEGER PRIMARY KEY,
-    `difficulty_rating` REAL NOT NULL,
-    `status` TEXT NOT NULL,
-    `total_length` INTEGER NOT NULL,
-    `user_id` INTEGER NOT NULL,
-    `version` TEXT NOT NULL
+    PRIMARY KEY (`round_id`, `beatmap_id`)
 );
