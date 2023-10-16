@@ -69,7 +69,12 @@ CREATE TABLE `match_ban` (
 );
 
 CREATE TABLE `round_beatmap` (
-    `round_id` INTEGER,
-    `beatmap_id` INTEGER,
-    PRIMARY KEY (`round_id`, `beatmap_id`)
+    `number` INTEGER NOT NULL,
+    `mod` TEXT NOT NULL,
+    `round_id` INTEGER NOT NULL,
+    `beatmap_id` INTEGER NOT NULL,
+    PRIMARY KEY (`round_id`, `mod`, `number`)
 );
+
+-- CACHE PROFILE_0
+-- CACHE BEATMAP_0_MOD
