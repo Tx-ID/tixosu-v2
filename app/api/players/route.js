@@ -19,6 +19,8 @@ export async function GET(req) {
 
     const players = await getRegisteredPlayers(tursoClient, upstashClient);
 
+    tursoClient.close();
+
     return NextResponse.json({
         players: players
     });
