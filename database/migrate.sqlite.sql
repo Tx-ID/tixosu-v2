@@ -14,14 +14,14 @@ CREATE TABLE `admin` (
 
 CREATE TABLE `participant` (
     `osu_id` INTEGER PRIMARY KEY,
-    `team_id` INTEGER,
-    `visible` BOOLEAN NOT NULL,
+    `team_id` INTEGER DEFAULT NULL,
+    `visible` BOOLEAN NOT NULL DEFAULT true,
 );
 
 CREATE TABLE `team` (
     `id` INTEGER PRIMARY KEY,
     `name` TEXT NOT NULL,
-    `icon_url` TEXT,
+    `icon_url` TEXT DEFAULT NULL,
 );
 
 CREATE TABLE `round` (
