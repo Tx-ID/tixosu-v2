@@ -11,7 +11,7 @@
 1. Login with your Turso account with the Turso CLI
 2. Make a new database if you haven't made one
 3. Run `cat database/migrate.sqlite.sql | turso db shell {your_database_name}` to migrate
-4. You may need to clear the database tables beforehand if you have made one before.
+4. **You may need to clear the database tables beforehand if you have made one before.**
 
 ## Initializing Upstash redis
 1. Login
