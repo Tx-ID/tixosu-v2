@@ -14,12 +14,14 @@ CREATE TABLE `admin` (
 
 CREATE TABLE `participant` (
     `osu_id` INTEGER PRIMARY KEY,
-    `team_id` INTEGER
+    `team_id` INTEGER,
+    `visible` BOOLEAN NOT NULL,
 );
 
 CREATE TABLE `team` (
     `id` INTEGER PRIMARY KEY,
-    `name` TEXT NOT NULL
+    `name` TEXT NOT NULL,
+    `icon_url` TEXT,
 );
 
 CREATE TABLE `round` (
@@ -55,7 +57,8 @@ CREATE TABLE `match_commentator` (
 CREATE TABLE `match_pick` (
     `number` INTEGER,
     `match_id` INTEGER,
-    `beatmap_id` INTEGER,
+    `number` INTEGER NOT NULL,
+    `mod` TEXT NOT NULL,
     `team` TEXT NOT NULL DEFAULT 'RED', -- ENUM(RED, BLUE)
     PRIMARY KEY (`number`, `match_id`)
 );
@@ -63,7 +66,8 @@ CREATE TABLE `match_pick` (
 CREATE TABLE `match_ban` (
     `number` INTEGER,
     `match_id` INTEGER,
-    `beatmap_id` INTEGER,
+    `number` INTEGER NOT NULL,
+    `mod` TEXT NOT NULL,
     `team` TEXT NOT NULL DEFAULT 'BLUE', -- ENUM(RED, BLUE)
     PRIMARY KEY (`number`, `match_id`)
 );
