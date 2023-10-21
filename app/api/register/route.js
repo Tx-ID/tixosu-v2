@@ -12,23 +12,18 @@ export async function POST(req) {
 
     console.log(JSON.stringify(session.data))
 
-    const res = new NextResponse()
-
     if (session.user === undefined) {
-        res.status = 401
-        return res
+        return NextResponse().status(401)
     }
 
     const playerSearchResult = await Players.getRegisteredPlayers(tursoClient, upstashClient)
     if (playerSearchResult[session.user.id] !== undefined) {
-        res.status = 400
-        return res
+        return NextResponse().status(400)
     }
 
     await Players.registerNewPlayer(tursoClient, session.user.id)
 
     tursoClient.close()
 
-    res.status = 200
-    return res
+    return NextResponse().status(200)
 }
