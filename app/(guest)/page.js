@@ -1,9 +1,22 @@
 'use client'
 
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 import { useSession, signIn, signOut } from 'next-auth/react'
 
 export default function Home() {
   const session = useSession();
+  const registerAsParticipantMutation = useMutation(
+    {
+      mutationFn: async () => {
+        const response = await axios.post("/api/register");
+        if (response.status !== 200) {
+          throw new Error("Player could not be registered");
+        }
+        return true
+      }
+    }
+  );
 
   return (
     <div className="mx-2 flex flex-col items-start">
@@ -39,18 +52,36 @@ export default function Home() {
           </table>
         </div>
         <div className="divider md:divider-horizontal"></div>
-        <div className="flex-grow mx-auto">
+        <div className="flex flex-col items-stretch flex-grow mx-auto gap-5">
           {(session.status == "loading") ? (
             <button disabled className="btn md:btn-block normal-case disabled:bg-white text-black">
               <span className="loading loading-spinner text-black"></span>
             </button>
           ) : (session.status == "authenticated") ? (
-            <button onClick={() => signOut()} className="btn md:btn-block normal-case bg-white text-black fill-black hover:fill-white hover:bg-primary hover:text-white">
-              <div className='h-7 w-7'>
-                <img src={session.data.user.image}></img>
-              </div>
-              <p>Sign out</p>
-            </button>
+            <>
+              <button onClick={() => signOut()} className="btn md:btn-block normal-case bg-white text-black fill-black hover:fill-white hover:bg-primary hover:text-white">
+                <div className='h-7 w-7'>
+                  <img src={session.data.user.image}></img>
+                </div>
+                <p>Sign out</p>
+              </button>
+              {
+                session.data.user.is_participant
+                  ? <span>{session.data.user.id} is participant</span>
+                  : (
+                    <button
+                      className='btn md:btn-block normal-case bg-red-700 border-white text-white'
+                      onClick={() => {
+                        registerAsParticipantMutation.mutate()
+                        session.update()
+                      }}
+                    >
+                      Register as Participant
+                    </button>
+                  )
+              }
+
+            </>
           ) : (
             <button onClick={() => signIn("osu")} className="btn md:btn-block normal-case bg-white text-black fill-black hover:fill-white hover:bg-primary hover:text-white">
               <svg className="h-7 w-7" id="Working_Image" data-name="Working Image" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">

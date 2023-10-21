@@ -1,6 +1,6 @@
 CREATE TABLE `access_token` (
     `token` TEXT PRIMARY KEY,
-    `expires_on` DATETIME NOT NULL
+    `expires_on` TEXT NOT NULL
 );
 
 CREATE TABLE `environment` (
@@ -14,18 +14,20 @@ CREATE TABLE `admin` (
 
 CREATE TABLE `participant` (
     `osu_id` INTEGER PRIMARY KEY,
-    `team_id` INTEGER
+    `team_id` INTEGER DEFAULT NULL,
+    `visible` BOOLEAN NOT NULL DEFAULT true
 );
 
 CREATE TABLE `team` (
     `id` INTEGER PRIMARY KEY,
-    `name` TEXT NOT NULL
+    `name` TEXT NOT NULL,
+    `icon_url` TEXT DEFAULT NULL
 );
 
 CREATE TABLE `round` (
     `order` INTEGER PRIMARY KEY,
     `name` TEXT NOT NULL,
-    `date` DATETIME NOT NULL,
+    `date` TEXT NOT NULL,
     `best_of` INTEGER NOT NULL
 );
 
@@ -34,14 +36,14 @@ CREATE TABLE `match` (
     `round_id` INTEGER NOT NULL,
     `red_team_id` INTEGER NOT NULL,
     `blue_team_id` INTEGER NOT NULL,
-    `date` DATETIME NOT NULL,
+    `date` TEXT NOT NULL,
     `referee` TEXT NOT NULL,
     -- Added after row creation
     `roll_winner` TEXT DEFAULT NULL, -- ENUM(RED, BLUE)
     `first_pick` TEXT DEFAULT NULL, -- ENUM(RED, BLUE)
     `first_ban` TEXT DEFAULT NULL, -- ENUM(RED, BLUE)
-    `red_points` FLOAT DEFAULT NULL,
-    `blue_points` FLOAT DEFAULT NULL,
+    `red_points` INTEGER DEFAULT NULL,
+    `blue_points` INTEGER DEFAULT NULL,
     `streamer` TEXT DEFAULT NULL,
     `mp_link` TEXT DEFAULT NULL
 );
@@ -53,28 +55,28 @@ CREATE TABLE `match_commentator` (
 );
 
 CREATE TABLE `match_pick` (
-    `number` INTEGER,
+    `number` INTEGER NOT NULL,
     `match_id` INTEGER,
-    `beatmap_id` INTEGER,
-    `team` TEXT NOT NULL DEFAULT 'RED', -- ENUM(RED, BLUE)
+    `mod` TEXT NOT NULL,
+    `team` TEXT NOT NULL DEFAULT 'RED', -- ENUM(RED, BLUE),
     PRIMARY KEY (`number`, `match_id`)
 );
 
 CREATE TABLE `match_ban` (
-    `number` INTEGER,
+    `number` INTEGER NOT NULL,
     `match_id` INTEGER,
-    `beatmap_id` INTEGER,
-    `team` TEXT NOT NULL DEFAULT 'BLUE', -- ENUM(RED, BLUE)
+    `mod` TEXT NOT NULL,
+    `team` TEXT NOT NULL DEFAULT 'BLUE', -- ENUM(RED, BLUE),
     PRIMARY KEY (`number`, `match_id`)
 );
 
-CREATE TABLE `map_pool` (
-    `id` INTEGER PRIMARY KEY,
-    `name` TEXT
+CREATE TABLE `round_beatmap` (
+    `number` INTEGER NOT NULL,
+    `mod` TEXT NOT NULL,
+    `round_id` INTEGER NOT NULL,
+    `beatmap_id` INTEGER NOT NULL,
+    PRIMARY KEY (`round_id`, `mod`, `number`)
 );
 
-CREATE TABLE `map_pool_beatmaps` (
-    `pool_id` INTEGER,
-    `beatmap_id` INTEGER,
-    PRIMARY KEY (`pool_id`, `beatmap_id`)
-);
+-- CACHE PROFILE_0
+-- CACHE BEATMAP_0_MOD
