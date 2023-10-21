@@ -10,8 +10,6 @@ export async function POST(req) {
     const upstashClient = Upstash.create()
     const session = await getServerSession(auth.config)
 
-    console.log(JSON.stringify(session.data))
-
     if (session.user === undefined) {
         return NextResponse().status(401)
     }
