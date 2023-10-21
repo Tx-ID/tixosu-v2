@@ -2,8 +2,8 @@ import { getServerSession } from "next-auth";
 import * as auth from "@/lib/auth.js";
 import { NextResponse } from "next/server";
 import { getRegisteredPlayers } from "@/lib/players";
-import turso from "@/lib/turso";
-import upstash from "@/lib/upstash";
+import * as Turso from "@/lib/turso";
+import * as Upstash from "@/lib/upstash";
 
 export async function GET(req) {
     const session = await getServerSession(auth.config);
@@ -14,8 +14,8 @@ export async function GET(req) {
         });
     }
 
-    const tursoClient = turso();
-    const upstashClient = upstash();
+    const tursoClient = Turso.create();
+    const upstashClient = Upstash.create();
 
     const players = await getRegisteredPlayers(tursoClient, upstashClient);
 
