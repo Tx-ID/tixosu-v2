@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate-fresh": "rm database/db.sqlite && (cat database/migrate.sqlite.sql | sqlite3 database/db.sqlite)"
   },
   "dependencies": {
     "@fontsource/lexend": "^5.0.13",
