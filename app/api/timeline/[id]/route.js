@@ -6,6 +6,11 @@ export async function GET(req, { params }) {
     const { id } = params
     const tursoClient = Turso.create()
     const event = await Timeline.getTimelineEvent(tursoClient, id)
+    if (event === undefined) {
+        return new NextResponse('Not Found', {
+            status: 404
+        })
+    }
     return NextResponse.json({
         ...event,
         start: event.start.toISO(),

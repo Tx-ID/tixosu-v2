@@ -40,22 +40,32 @@ export default function Home() {
     }
   );
 
-  const [registrationEndsIn, setRegistrationEndsIn] = useState(Duration.fromMillis(0))
-
-  useEffect(() => {
-    axios.get(`/api/timeline/${REGISTRATION_ID}`)
-      .then((response) => DateTime.fromISO(response.data.end).diff(DateTime.now(), ['days', 'hours', 'minutes', 'seconds', 'milliseconds']))
-      .then((endsIn) => setRegistrationEndsIn(endsIn))
-  })
+  const [registrationEndsIn, setRegistrationEndsIn] = useState(Duration.fromObject({}))
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setRegistrationEndsIn(registrationEndsIn.minus({
-        seconds: 1
-      }))
+      setRegistrationEndsIn(
+        registrationEndsIn.toMillis() > 0
+          ? registrationEndsIn.minus({
+            seconds: 1
+          })
+          : Duration.fromObject({ seconds: 0 }))
     }, 1000)
     return () => clearInterval(interval)
-  }, registrationEndsIn)
+  }, [registrationEndsIn])
+
+  useEffect(() => {
+    axios.get(`/api/timeline/${REGISTRATION_ID}`)
+      .then((response) => {
+        if (response.status !== 200) {
+          throw new Error('Could not retrieve registration timeline event')
+        }
+        return response
+      })
+      .then((response) => DateTime.fromISO(response.data.end).diff(DateTime.now(), ['days', 'hours', 'minutes', 'seconds', 'milliseconds']))
+      .then((endsIn) => setRegistrationEndsIn(endsIn))
+      .catch((_err) => { })
+  }, [])
 
   return (
     <div className="mx-2 flex flex-col items-start">
