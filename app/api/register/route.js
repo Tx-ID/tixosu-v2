@@ -11,17 +11,23 @@ export async function POST(req) {
     const session = await getServerSession(auth.config)
 
     if (session.user === undefined) {
-        return NextResponse().status(401)
+        return new NextResponse('Not Authenticated', {
+            status: 401
+        })
     }
 
     const playerSearchResult = await Players.getRegisteredPlayers(tursoClient, upstashClient)
     if (playerSearchResult[session.user.id] !== undefined) {
-        return NextResponse().status(400)
+        return new NextResponse('User Already Registered', {
+            status: 400
+        })
     }
 
     await Players.registerNewPlayer(tursoClient, session.user.id)
 
     tursoClient.close()
 
-    return NextResponse().status(200)
+    return new NextResponse('OK', {
+        status: 200
+    })
 }

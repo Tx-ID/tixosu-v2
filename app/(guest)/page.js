@@ -1,8 +1,11 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query';
+import { REGISTRATION_ID } from '@/lib/timeline/const';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { DateTime, Duration } from 'luxon';
 import { useSession, signIn, signOut } from 'next-auth/react'
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const session = useSession();
@@ -17,6 +20,52 @@ export default function Home() {
       }
     }
   );
+  const getTimelineEventsQuery = useQuery(
+    {
+      queryKey: ['events'],
+      queryFn: async () => {
+        const response = await axios.get("/api/timeline")
+        if (response.status !== 200) {
+          throw new Error("Could not retrieve timeline")
+        }
+        return {
+          ...response.data,
+          events: response.data.events.map((e) => ({
+            ...e,
+            start: DateTime.fromISO(e.start),
+            end: DateTime.fromISO(e.end)
+          }))
+        }
+      }
+    }
+  );
+
+  const [registrationEndsIn, setRegistrationEndsIn] = useState(Duration.fromObject({}))
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRegistrationEndsIn(
+        registrationEndsIn.toMillis() > 0
+          ? registrationEndsIn.minus({
+            seconds: 1
+          })
+          : Duration.fromObject({ seconds: 0 }))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [registrationEndsIn])
+
+  useEffect(() => {
+    axios.get(`/api/timeline/${REGISTRATION_ID}`)
+      .then((response) => {
+        if (response.status !== 200) {
+          throw new Error('Could not retrieve registration timeline event')
+        }
+        return response
+      })
+      .then((response) => DateTime.fromISO(response.data.end).diff(DateTime.now(), ['days', 'hours', 'minutes', 'seconds', 'milliseconds']))
+      .then((endsIn) => setRegistrationEndsIn(endsIn))
+      .catch((_err) => { })
+  }, [])
 
   return (
     <div className="mx-2 flex flex-col items-start">
@@ -31,23 +80,12 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {/* fill with schedules from settings */}
-              <tr>
-                <th>3 Oct - 10 Oct</th>
-                <th>Beep Boop</th>
-              </tr>
-              <tr>
-                <th>3 Oct - 10 Oct</th>
-                <th>Beep Boop</th>
-              </tr>
-              <tr>
-                <th>3 Oct - 10 Oct</th>
-                <th>Beep Boop</th>
-              </tr>
-              <tr>
-                <th>3 Oct - 10 Oct</th>
-                <th>Beep Boop</th>
-              </tr>
+              {(getTimelineEventsQuery.data?.events ?? []).map((event) => (
+                <tr>
+                  <th>{event.start.toFormat('dd LLL yyyy HH:mm')} - {event.end.toFormat('dd LLL yyyy HH:mm')}</th>
+                  <th>{event.name}</th>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -91,6 +129,33 @@ export default function Home() {
               <p>Sign in with osu!</p>
             </button>
           )}
+          <strong className='text-center text-xl'>Closes In</strong>
+          <div className="flex gap-5 text-center">
+            <div>
+              <span className="countdown font-mono text-4xl">
+                <span style={{ "--value": registrationEndsIn.get('days') }}></span>
+              </span>
+              days
+            </div>
+            <div>
+              <span className="countdown font-mono text-4xl">
+                <span style={{ "--value": registrationEndsIn.get('hours') }}></span>
+              </span>
+              hours
+            </div>
+            <div>
+              <span className="countdown font-mono text-4xl">
+                <span style={{ "--value": registrationEndsIn.get('minutes') }}></span>
+              </span>
+              min
+            </div>
+            <div>
+              <span className="countdown font-mono text-4xl">
+                <span style={{ "--value": registrationEndsIn.get('seconds') }}></span>
+              </span>
+              sec
+            </div>
+          </div>
         </div>
       </div>
     </div>

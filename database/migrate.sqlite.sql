@@ -8,6 +8,17 @@ CREATE TABLE `environment` (
     `active` BOOLEAN NOT NULL
 );
 
+CREATE TABLE `timeline_event` (
+    `id` TEXT PRIMARY KEY,
+    `name` TEXT NOT NULL,
+    `start_time` TEXT NOT NULL,
+    `end_time` TEXT NOT NULL,
+    CHECK (`start_time` < `end_time`)
+);
+
+CREATE INDEX `by_start` ON `timeline_event`(`start_time`);
+
+
 CREATE TABLE `admin` (
     `osu_id` INTEGER PRIMARY KEY
 );
