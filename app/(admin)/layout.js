@@ -8,7 +8,7 @@ const lexend = Lexend({ subsets: ['latin'] })
 
 export default async function RootLayout({ children }) {
   const session = await auth.auth();
-  if (session?.user.is_admin == false) {
+  if (session?.user.is_admin === false) {
     redirect("/")
     return <></>
   }

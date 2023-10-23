@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate-fresh": "rm database/db.sqlite && (cat database/migrate.sqlite.sql | sqlite3 database/db.sqlite)"
+    "migrate-fresh": "rm -f database/db.sqlite && (cat database/migrate.sqlite.sql | sqlite3 database/db.sqlite)"
   },
   "dependencies": {
     "@fontsource/lexend": "^5.0.13",
@@ -18,15 +18,18 @@
     "axios": "^1.5.1",
     "cookie": "^0.5.0",
     "cross-env": "^7.0.3",
+    "debug": "^4.3.4",
     "luxon": "^3.4.3",
     "next": "^13.5.4",
     "next-auth": "^4.23.2",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "supports-color": "^9.4.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.8.3",
+    "dependency-cruiser": "^15.0.0",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.3"
   }

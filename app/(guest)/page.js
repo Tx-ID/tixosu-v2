@@ -108,7 +108,7 @@ export default function Home() {
                   ? <span>{session.data.user.id} is participant</span>
                   : (
                     <button
-                      className='btn md:btn-block normal-case bg-red-700 border-white text-white'
+                      className='btn md:btn-block normal-case bg-red-700 hover:bg-red-300 border-white text-white'
                       onClick={() => {
                         registerAsParticipantMutation.mutate()
                         session.update()

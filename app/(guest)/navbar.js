@@ -34,9 +34,9 @@ export default function navbar() {
                 })}
                 {session.status == "loading" || session.status == "unauthenticated" ? "" :
                     !session.data.user.is_admin ? "" :
-                        <Link onClick={() => { goToPage("/admin") }} href={"/admin"} key={pages.length + 1} className={'ml-3 transition-colors duration-150 ' + ("/admin" == page ? "text-primary" : "hover:text-primary")}>
+                        <a href={"/admin"} onClick={() => { }} key={pages.length + 1} className={'ml-3 transition-colors duration-150 ' + ("/admin" == page ? "text-primary" : "hover:text-primary")}>
                             <p>{"Admin"}</p>
-                        </Link>
+                        </a>
                 }
             </div>
             <div className='md:hidden'>
