@@ -4,6 +4,9 @@ import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { DateTime, Duration } from 'luxon';
 
+import { Source_Code_Pro } from "next/font/google"
+const sourceCodePro = Source_Code_Pro({ subsets: ["latin"] })
+
 export default function page() {
     return (
         <>
@@ -11,7 +14,6 @@ export default function page() {
             <table className="mt-4 table rounded-lg bg-[#121212]">
                 <thead>
                     <tr className="border-dark border-b-2 text-white">
-                        <th></th>
                         <th>Id</th>
                         <th>Name</th>
                         <th>Start</th>
@@ -20,14 +22,12 @@ export default function page() {
                 </thead>
                 <tbody>
                     <tr className="border-zinc-900">
-                        <th className="bg-dark">1</th>
-                        <th className="bg-dark">registration</th>
-                        <th className="bg-dark">Registraton</th>
+                        <th className={"bg-dark font-normal " + sourceCodePro.className}>registration</th>
+                        <th className="bg-dark">Registration</th>
                         <th className="bg-dark">{DateTime.fromISO("2020-01-01").toString()}</th>
                         <th className="bg-dark">{DateTime.fromISO("2024-01-01").toString()}</th>
                     </tr>
                     <tr className="border-zinc-900">
-                        <th className="bg-dark"></th>
                         <th className="bg-dark"></th>
                         <th className="bg-dark"></th>
                         <th className="bg-dark"></th>
