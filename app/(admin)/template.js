@@ -24,6 +24,7 @@ export default function Template({ children, session }) {
     ["Registered Players", "/admin/registered"],
     ["Teams", "/admin/teams"],
     ["Pools", "/admin/pools"],
+    ["Timeline", '/admin/timeline'],
   ]
 
   return (
