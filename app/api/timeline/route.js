@@ -43,5 +43,5 @@ export async function POST(req) {
         end: DateTime.fromISO(body.end)
     })
 
-    return NextResponse.json(created)
+    return NextResponse.json({ 'content': "yay" })
 }
