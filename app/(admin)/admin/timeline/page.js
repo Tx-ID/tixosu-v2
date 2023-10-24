@@ -64,7 +64,12 @@ export default function page() {
                 <div className="relative z-20 m-auto flex bg-dark rounded-lg">
                     <div className="p-4 flex flex-col">
                         {modalType === "add"
-                            ? <AddTimelineWindow submitFn={insertTimeline.mutate} isLoading={insertTimeline.isLoading} />
+                            ? <AddTimelineWindow isLoading={insertTimeline.isLoading}
+                                submitFn={(timeline) => {
+                                    insertTimeline.mutate(timeline, {
+                                        onSuccess: () => { getTimelineEventsQuery.refetch() }
+                                    })
+                                }} />
                             : <>Unknown modal type: {modalType}</>
                         }
                     </div>
@@ -94,7 +99,7 @@ export default function page() {
                 <tbody>
                     {getTimelineEventsQuery.data?.events ? getTimelineEventsQuery.data.events.map((event, index) => (
                         <tr key={index} className="border-zinc-900">
-                            <th className={"bg-dark font-normal " + sourceCodePro.className}>{event.id}</th>
+                            <th className={"bg-dark font-normal max-w-[10rem] break-all " + sourceCodePro.className}>{event.id}</th>
                             <th className="bg-dark">{event.name}</th>
                             <th className="bg-dark">{DateTime.fromISO(event.start).toFormat("dd LLL yyyy")}</th>
                             <th className="bg-dark">{DateTime.fromISO(event.end).toFormat("dd LLL yyyy")}</th>
