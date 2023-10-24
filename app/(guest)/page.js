@@ -90,7 +90,7 @@ export default function Home() {
           </table>
         </div>
         <div className="divider md:divider-horizontal"></div>
-        <div className="flex flex-col items-stretch flex-grow mx-auto gap-5">
+        <div className="flex flex-col items-stretch flex-grow gap-5">
           {(session.status == "loading") ? (
             <button disabled className="btn md:btn-block normal-case disabled:bg-white text-black">
               <span className="loading loading-spinner text-black"></span>
@@ -108,13 +108,23 @@ export default function Home() {
                   ? <span>{session.data.user.id} is participant</span>
                   : (
                     <button
-                      className='btn md:btn-block normal-case bg-primary hover:bg-primary-dark text-white'
+                      className='btn md:btn-block flex flex-col gap-0 normal-case bg-primary hover:bg-primary-dark text-white'
                       onClick={() => {
                         registerAsParticipantMutation.mutate()
                         session.update()
                       }}
                     >
-                      Register as Participant
+                      <p className='mt-2'>Register as Participant</p>
+                      <div className="mb-1 flex gap-1 text-center font-normal">
+                        {["days", "hours", "minutes", "seconds"].map((value, index) => (
+                          <div key={index} className='flex items-center text-xs'>
+                            <span className="countdown font-mono">
+                              <span className='' style={{ "--value": registrationEndsIn.get(value) }}></span>
+                            </span>
+                            <p className=''>{value.substring(0, 1)}</p>
+                          </div>
+                        ))}
+                      </div>
                     </button>
                   )
               }
@@ -129,33 +139,6 @@ export default function Home() {
               <p>Sign in with osu!</p>
             </button>
           )}
-          <strong className='text-center text-xl'>Closes In</strong>
-          <div className="flex gap-5 text-center">
-            <div className='flex items-center'>
-              <span className="countdown font-mono text-md">
-                <span className='' style={{ "--value": registrationEndsIn.get('days') }}></span>
-              </span>
-              <p className='text-xs'>days</p>
-            </div>
-            <div>
-              <span className="countdown font-mono text-4xl">
-                <span style={{ "--value": registrationEndsIn.get('hours') }}></span>
-              </span>
-              hours
-            </div>
-            <div>
-              <span className="countdown font-mono text-4xl">
-                <span style={{ "--value": registrationEndsIn.get('minutes') }}></span>
-              </span>
-              min
-            </div>
-            <div>
-              <span className="countdown font-mono text-4xl">
-                <span style={{ "--value": registrationEndsIn.get('seconds') }}></span>
-              </span>
-              sec
-            </div>
-          </div>
         </div>
       </div>
     </div >
