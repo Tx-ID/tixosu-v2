@@ -103,10 +103,9 @@ export default function page() {
                             <th className="bg-dark">{event.name}</th>
                             <th className="bg-dark">{DateTime.fromISO(event.start).toFormat("dd LLL yyyy")}</th>
                             <th className="bg-dark">{DateTime.fromISO(event.end).toFormat("dd LLL yyyy")}</th>
-                            <th className="bg-dark">
-                                <button className="btn btn-sm">EDIT</button>
-                            </th>
-                            <th className="bg-dark">
+                            <th className="bg-dark"></th>
+                            <th className="bg-dark flex justify-end gap-4">
+                                <button className="btn ml-auto btn-sm">EDIT</button>
                                 <button className="btn btn-sm">DELETE</button>
                             </th>
                         </tr>
