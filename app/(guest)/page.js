@@ -82,7 +82,7 @@ export default function Home() {
             <tbody>
               {(getTimelineEventsQuery.data?.events ?? []).map((event) => (
                 <tr>
-                  <th>{event.start.toFormat('dd LLL yyyy HH:mm')} - {event.end.toFormat('dd LLL yyyy HH:mm')}</th>
+                  <th>{event.start.toFormat('dd LLL yyyy')} - {event.end.toFormat('dd LLL yyyy')}</th>
                   <th>{event.name}</th>
                 </tr>
               ))}
@@ -108,7 +108,7 @@ export default function Home() {
                   ? <span>{session.data.user.id} is participant</span>
                   : (
                     <button
-                      className='btn md:btn-block normal-case bg-red-700 hover:bg-red-300 border-white text-white'
+                      className='btn md:btn-block normal-case bg-primary hover:bg-primary-dark text-white'
                       onClick={() => {
                         registerAsParticipantMutation.mutate()
                         session.update()
@@ -131,11 +131,11 @@ export default function Home() {
           )}
           <strong className='text-center text-xl'>Closes In</strong>
           <div className="flex gap-5 text-center">
-            <div>
-              <span className="countdown font-mono text-4xl">
-                <span style={{ "--value": registrationEndsIn.get('days') }}></span>
+            <div className='flex items-center'>
+              <span className="countdown font-mono text-md">
+                <span className='' style={{ "--value": registrationEndsIn.get('days') }}></span>
               </span>
-              days
+              <p className='text-xs'>days</p>
             </div>
             <div>
               <span className="countdown font-mono text-4xl">
@@ -158,6 +158,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
