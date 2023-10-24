@@ -48,7 +48,7 @@ export default function Home() {
         registrationEndsIn.toMillis() > 0
           ? registrationEndsIn.minus({
             seconds: 1
-          })
+          }).normalize()
           : Duration.fromObject({ seconds: 0 }))
     }, 1000)
     return () => clearInterval(interval)
