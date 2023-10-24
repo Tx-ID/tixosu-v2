@@ -8,24 +8,25 @@ import Link from "next/link";
 import Modal from "@/app/(admin)/modal.js";
 
 import { Source_Code_Pro } from "next/font/google"
+import { useState } from "react";
 const sourceCodePro = Source_Code_Pro({ subsets: ["latin"] })
 
 export default function page() {
+    const [modal, setModal] = useState(true)
+
     return (
         <>
-            {/* <Modal>
+            <Modal modalVisible={modal} onClick={() => { setModal(false) }}>
                 <p>Hello World AAAAAAAAAAAAAAAAAAAAAA</p>
-            </Modal> */}
+            </Modal>
             <div className="flex flex-row justify-between w-full">
                 <h1 className="text-3xl text-white font-bold">Sheets</h1>
-                <a href="#">
-                    <button className="btn btn-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth={1.5} className="w-3 h-3 stroke-white">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                        <p>Add Timeline</p>
-                    </button>
-                </a>
+                <button onClick={(e) => { setModal(true) }} className="btn btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth={1.5} className="w-3 h-3 stroke-white">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    <p>Add Timeline</p>
+                </button>
             </div>
 
             <table className="mt-4 table rounded-lg bg-[#121212]">
