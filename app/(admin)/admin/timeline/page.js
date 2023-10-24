@@ -64,7 +64,7 @@ export default function page() {
                 <div className="relative z-20 m-auto flex bg-dark rounded-lg">
                     <div className="p-4 flex flex-col">
                         {modalType === "add"
-                            ? <AddTimelineWindow onSubmit={insertTimeline} isLoading={insertTimeline.isLoading} />
+                            ? <AddTimelineWindow submitFn={insertTimeline.mutate} isLoading={insertTimeline.isLoading} />
                             : <>Unknown modal type: {modalType}</>
                         }
                     </div>
