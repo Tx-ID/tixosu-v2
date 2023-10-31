@@ -19,11 +19,11 @@ export default function Template({ children, session }) {
   }
 
   const pages = [
-    ["Authorization", "/admin/authorization"],
-    ["Sheets", "/admin/sheets"],
-    ["Registered Players", "/admin/registered"],
+    // ["Authorization", "/admin/authorization"],
+    // ["Sheets", "/admin/sheets"],
+    ["Players", "/admin/registered"],
     ["Teams", "/admin/teams"],
-    ["Pools", "/admin/pools"],
+    ["Rounds", "/admin/rounds"],
     ["Timeline", '/admin/timeline'],
   ]
 

@@ -12,7 +12,7 @@ export default function add({ submitFn, isLoading }) {
 
     const [timelineValid, setValid] = useState(false)
     useEffect(() => {
-        setValid(timeline.id != "" && timeline.name != "" && timeline.start != "" && timeline.end != "")
+        setValid(timeline.id != "" && timeline.name != "" && timeline.start != "" && timeline.end != "" && timeline.start < timeline.end)
     }, [timeline])
 
     return (<div className="flex flex-col gap-2">
@@ -47,11 +47,11 @@ export default function add({ submitFn, isLoading }) {
                 })
             }} type="date" className="input placeholder:text-zinc-600"></input>
         </div>
-        <button onClick={() => { if (!isLoading && timelineValid) { submitFn(timeline) } }} className={"mt-4 btn " + (isLoading || !timelineValid ? "bg-slate-700 hover:bg-slate-700 text-slate-900" : "bg-primary hover:bg-primary-dark text-black") + " "}>
+        <button onClick={() => { submitFn(timeline) }} className={"mt-4 btn " + (isLoading || !timelineValid ? "btn-disabled" : "bg-primary hover:bg-primary-dark text-black") + " "}>
             {!timelineValid
-                ? "INVALID DATA"
+                ? "ADD TIMELINE"
                 : isLoading === true
-                    ? <span className="loading loading-spinner text-black"></span>
+                    ? <span className="loading loading-spinner"></span>
                     : "ADD TIMELINE"}
         </button>
     </div>)
