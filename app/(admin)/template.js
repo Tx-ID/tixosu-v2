@@ -30,7 +30,7 @@ export default function Template({ children, session }) {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider session={session}>
-        <div className={"grid grid-cols-6 gap-4 pt-2"}>
+        <div className={"grid grid-cols-6 gap-4 pt-2 h-full"}>
           <div className={"flex flex-col col-span-1"}>
             <Link onClick={() => { goToPage("/") }} href={"/"} key={-1} className={'hover:text-primary transition-colors duration-150 rounded-lg hover:bg-zinc-900 px-4 py-2'}>
               <p className={'font-bold ' + ("/" == page ? "text-primary hover:text-primary" : "")}>

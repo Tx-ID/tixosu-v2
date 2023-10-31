@@ -25,10 +25,13 @@
     "next-auth": "^4.23.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-sortablejs": "^6.1.4",
+    "sortablejs": "^1.15.0",
     "supports-color": "^9.4.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/sortablejs": "^1.15.4",
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.8.3",
     "dependency-cruiser": "^15.0.0",
