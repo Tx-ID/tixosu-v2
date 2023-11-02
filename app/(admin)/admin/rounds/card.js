@@ -2,9 +2,11 @@
 import { DateTime } from "luxon";
 import { useState } from "react";
 import { ReactSortable } from "react-sortablejs";
+import { useMutation } from "@tanstack/react-query";
+
 import BeatmapCard from "./beatmap"
 
-export default function card({ roundData, onChange }) {
+export default function card({ roundData, onChange, onDelete, isDeleting }) {
     const [data, setData] = useState(roundData);
     const [beatmaps, setBeatmaps] = useState([
         { round_id: 1, beatmap_id: 1, mods: "NM", number: 1 },
@@ -20,7 +22,7 @@ export default function card({ roundData, onChange }) {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-zinc-700">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
             </svg>
-            <p className="font-bold">#{data.id}</p>
+            <p className="font-bold">#{data.zindex}</p>
             <div className="flex flex-col">
                 <label className="label-text text-xs">Name</label>
                 <input type='text' className="input input-bordered input-sm" value={data.name} onChange={(e) => {
@@ -43,7 +45,7 @@ export default function card({ roundData, onChange }) {
             </div>
             <div className="flex flex-col mr-auto">
                 <label className="label-text text-xs">Start Date</label>
-                <input type='date' className="input input-bordered input-sm" value={data.date.toISODate()} onChange={(e) => {
+                <input type='date' className="input input-bordered input-sm" value={DateTime.fromISO(data.date).toSQLDate()} onChange={(e) => {
                     setData({
                         ...data,
                         date: DateTime.fromISO(e.target.value),
@@ -52,7 +54,7 @@ export default function card({ roundData, onChange }) {
                 }}></input>
             </div>
             <div className="flex items-center">
-                <button className="btn btn-warning btn-sm">DELETE</button>
+                <button onClick={() => { onDelete(data.id) }} className={"btn btn-warning btn-sm " + (isDeleting ? "btn-disabled" : "")}>DELETE</button>
             </div>
         </div>
 

@@ -36,7 +36,8 @@ CREATE TABLE `team` (
 );
 
 CREATE TABLE `round` (
-    `order` INTEGER PRIMARY KEY,
+    `id` INTEGER PRIMARY KEY,
+    `zindex` INTEGER NOT NULL,
     `name` TEXT NOT NULL,
     `date` TEXT NOT NULL,
     `best_of` INTEGER NOT NULL
