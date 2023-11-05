@@ -87,7 +87,7 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting }
 
     return <div key={toString(editedRound.id)} className={"bg-zinc-900 rounded-lg flex flex-col pt-4 gap-4 " + (editedRound.beatmaps.length <= 0 ? "pb-4" : "pb-2")}>
         <div className="flex items-center gap-4 w-full px-4 justify-between">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-zinc-700">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-zinc-700 round-dragger">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
             </svg>
             <p className="font-bold">#{editedRound.zindex}</p>
@@ -111,18 +111,7 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting }
 
         {editedRound.beatmaps.length <= 0 ? "" :
             <div className="bg-dark w-full p-4">
-                {/* <div className="flex gap-1 flex-col">
-                    {editedRound.beatmaps.map((beatmap, index) => (
-                        <BeatmapCard
-                            key={index}
-
-                            beatmap={beatmap}
-                            onBeatmapUpdate={handleMapUpdate}
-                            onBeatmapDelete={handleMapDelete}
-                        />
-                    ))}
-                </div> */}
-                <ReactSortable className="flex gap-1 flex-col" list={editedRound.beatmaps} setList={handleMapZIndexUpdate} animation={150} fallbackOnBody swapThreshold={0.65} direction={"vertical"}>
+                <ReactSortable className="flex gap-1 flex-col" list={editedRound.beatmaps} setList={handleMapZIndexUpdate} animation={150} fallbackOnBody swapThreshold={0.65} direction={"vertical"} handle=".map-dragger">
                     {editedRound.beatmaps.map((beatmap, index) => (
                         <BeatmapCard
                             key={index}

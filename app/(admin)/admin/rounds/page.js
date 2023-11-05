@@ -13,7 +13,8 @@ export default function roundsPage() {
     // this state machine will be useful
     // my face rn -> https://img.guildedcdn.com/ContentMediaGenericFiles/40040c95218d999c2a2fc51c33e129d9-Full.webp?w=512&h=272
 
-    const [rounds, setRounds] = useState([]) // { ...round, beatmaps: {} }[]
+    const [last_rounds, setLastRounds] = useState([]);
+    const [rounds, setRounds] = useState([]); // { ...round, beatmaps: {} }[]
     const [allowChanges, setChanges] = useState(false);
 
     const queryRounds = useQuery({
@@ -24,13 +25,17 @@ export default function roundsPage() {
                 throw new Error("Unable to fetch rounds");
             }
 
-            response.data.map((e) => ({
-                ...e,
-                date: DateTime.fromISO(e.date),
-                beatmaps: e.beatmaps || []
-            }))
-            setRounds(response.data);
-            return response.data;
+            // console.log("updated!")
+            setRounds(
+                response.data.map((e) => ({
+                    ...e,
+                    date: DateTime.fromISO(e.date),
+                    beatmaps: e.beatmaps || []
+                }))
+            );
+            setLastRounds(rounds.map(e => e));
+
+            return rounds;
         },
     })
 
@@ -41,7 +46,6 @@ export default function roundsPage() {
             if (response.status !== 200) {
                 throw new Error("Unable to fetch rounds");
             }
-
             return response.data;
         }
     })
@@ -58,6 +62,18 @@ export default function roundsPage() {
         }
     })
 
+    const requestUpdateRounds = useMutation({
+        mutationKey: ["update_rounds"],
+        mutationFn: async () => {
+            const response = await axios.post(`/api/rounds/update`, rounds);
+            if (response.status !== 200) {
+                throw new Error("Unable to update rounds");
+            }
+
+            return response.data;
+        }
+    })
+
     //
 
     const handleRoundUpdate = (new_round) => {
@@ -68,8 +84,7 @@ export default function roundsPage() {
             return round;
         });
         setRounds(e => new_rounds);
-
-
+        setChanges(true);
     };
 
     const handleRoundDelete = (round_id) => {
@@ -105,7 +120,7 @@ export default function roundsPage() {
                 ? <div>
                     No one but us chickens!
                 </div>
-                : <ReactSortable className="flex gap-2 flex-col pb-20" list={rounds} setList={e => setRounds(f => e)} animation={150} fallbackOnBody swapThreshold={0.65} direction={"vertical"}>
+                : <ReactSortable className="flex gap-2 flex-col pb-20" list={rounds} setList={e => setRounds(f => e)} animation={150} handle=".round-dragger">
                     {rounds.map((round) => (
                         <RoundCard
                             key={round.id}
@@ -121,7 +136,9 @@ export default function roundsPage() {
                 </ReactSortable>
         }
         <div className="absolute bottom-5 right-0">
-            <button className={"btn " + (allowChanges ? "btn-primary" : "btn-disabled")}>SAVE CHANGES</button>
+            <button className={"btn " + ((allowChanges && !requestUpdateRounds.isLoading) ? "btn-primary" : "btn-disabled")} onClick={e => requestUpdateRounds.mutate(null, {
+                onSuccess: () => queryRounds.refetch()
+            })}>SAVE CHANGES</button>
         </div>
     </div>)
 }
