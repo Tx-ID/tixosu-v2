@@ -9,9 +9,11 @@ import * as Upstash from "@/lib/upstash"
  * @param {@param {NextRequest} req } req 
  */
 export async function GET(req) {
+    const body = req.body.json();
+
     const tursoClient = Turso.create();
     const upstashClient = Upstash.create();
 
-    const beatmap = await Osu.getBeatmapWithAttributes(tursoClient, upstashClient, 3836427, 65)
+    const beatmap = await Osu.getBeatmapWithAttributes(tursoClient, upstashClient, parseInt(body.BeatmapId), Beatmap.parseMods(body.Mods))
     return NextResponse.json(beatmap)
 }

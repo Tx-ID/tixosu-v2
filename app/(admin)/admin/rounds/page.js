@@ -1,21 +1,20 @@
 'use client'
 
 import { DateTime } from "luxon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import RoundCard from "./card"
 
-export default function rounds() {
+export default function roundsPage() {
 
     // this state machine will be useful
     // my face rn -> https://img.guildedcdn.com/ContentMediaGenericFiles/40040c95218d999c2a2fc51c33e129d9-Full.webp?w=512&h=272
 
-    const [rounds, setRounds] = useState([
-        // { id: 1, name: "Round of 64", best_of: 9, date: DateTime.fromISO("2023-11-30") },
-    ])
+    const [rounds, setRounds] = useState([]) // { ...round, beatmaps: {} }[]
+    const [allowChanges, setChanges] = useState(false);
 
     const queryRounds = useQuery({
         queryKey: ['rounds'],
@@ -28,14 +27,14 @@ export default function rounds() {
             response.data.map((e) => ({
                 ...e,
                 date: DateTime.fromISO(e.date),
+                beatmaps: e.beatmaps || []
             }))
-
             setRounds(response.data);
             return response.data;
         },
     })
 
-    const newRound = useMutation({
+    const requestNewRound = useMutation({
         mutationKey: ["new_round"],
         mutationFn: async () => {
             const response = await axios.post("/api/rounds/new");
@@ -47,7 +46,7 @@ export default function rounds() {
         }
     })
 
-    const deleteRound = useMutation({
+    const requestDeleteRound = useMutation({
         mutationKey: ["delete_round"],
         mutationFn: async (id) => {
             const response = await axios.post(`/api/rounds/${id}/delete`);
@@ -59,18 +58,43 @@ export default function rounds() {
         }
     })
 
-    const [allowChanges, setChanges] = useState(false);
+    //
+
+    const handleRoundUpdate = (new_round) => {
+        const new_rounds = rounds.map((round) => {
+            if (round.id === new_round.id) {
+                return new_round;
+            }
+            return round;
+        });
+        setRounds(e => new_rounds);
+
+
+    };
+
+    const handleRoundDelete = (round_id) => {
+        requestDeleteRound.mutate(round_id, {
+            onSettled: () => {
+                queryRounds.refetch();
+            }
+        })
+    }
 
     return (<div className="overflow-auto relative h-full min-w-fit">
         <h1 className="text-3xl text-white font-bold mb-4 flex flex-row justify-between items-center">
             <p>Rounds</p>
-            <button className={"btn btn-neutral btn-xs w-fit mr-4 " + (newRound.isLoading ? "btn-disabled" : "")} onClick={() => {
-                newRound.mutate(null, {
-                    onSettled: () => {
-                        queryRounds.refetch();
-                    }
-                })
-            }}>add round</button>
+            <button
+                className={"btn btn-neutral btn-xs w-fit mr-4 " + (requestNewRound.isLoading ? "btn-disabled" : "")}
+                onClick={() => {
+                    requestNewRound.mutate(null, {
+                        onSettled: () => {
+                            queryRounds.refetch();
+                        }
+                    })
+                }}
+            >
+                add round
+            </button>
         </h1>
 
         {(queryRounds.status !== "success")
@@ -81,26 +105,21 @@ export default function rounds() {
                 ? <div>
                     No one but us chickens!
                 </div>
-                : <ReactSortable className="flex gap-2 flex-col pb-20" list={rounds} setList={setRounds} animation={150} fallbackOnBody swapThreshold={0.65}>
+                : <ReactSortable className="flex gap-2 flex-col pb-20" list={rounds} setList={e => setRounds(f => e)} animation={150} fallbackOnBody swapThreshold={0.65} direction={"vertical"}>
                     {rounds.map((round) => (
                         <RoundCard
                             key={round.id}
-                            roundData={round}
+                            round={round}
+
                             onChange={setChanges}
-                            onDelete={(id) => {
-                                deleteRound.mutate(id, {
-                                    onSettled: () => {
-                                        queryRounds.refetch();
-                                    }
-                                })
-                            }}
-                            isDeleting={deleteRound.variables === round.id}
+                            onRoundDelete={handleRoundDelete}
+                            onRoundUpdate={handleRoundUpdate}
+
+                            isDeleting={requestDeleteRound.variables === round.id}
                         />
                     ))}
                 </ReactSortable>
         }
-
-
         <div className="absolute bottom-5 right-0">
             <button className={"btn " + (allowChanges ? "btn-primary" : "btn-disabled")}>SAVE CHANGES</button>
         </div>
