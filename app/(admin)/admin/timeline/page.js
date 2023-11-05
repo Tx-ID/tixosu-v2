@@ -37,25 +37,24 @@ export default function page() {
         }
     })
 
-    const getTimelineEventsQuery = useQuery(
-        {
-            queryKey: ['events'],
-            queryFn: async () => {
-                const response = await axios.get("/api/timeline")
-                if (response.status !== 200) {
-                    throw new Error("Could not retrieve timeline")
-                }
-                return {
-                    ...response.data,
-                    events: response.data.events.map((e) => ({
-                        ...e,
-                        start: DateTime.fromISO(e.start),
-                        end: DateTime.fromISO(e.end)
-                    }))
-                }
+    const getTimelineEventsQuery = useQuery({
+        queryKey: ['events'],
+        queryFn: async () => {
+            const response = await axios.get("/api/timeline")
+            if (response.status !== 200) {
+                throw new Error("Could not retrieve timeline")
             }
-        }
-    );
+            return {
+                ...response.data,
+                events: response.data.events.map((e) => ({
+                    ...e,
+                    start: DateTime.fromISO(e.start),
+                    end: DateTime.fromISO(e.end)
+                }))
+            }
+        },
+        refetchOnWindowFocus: false,
+    });
 
     return (
         <>

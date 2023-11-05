@@ -8,18 +8,17 @@ export default function page() {
 
     const formatter = Intl.NumberFormat("en-US");
 
-    const getPlayersQuery = useQuery(
-        {
-            queryKey: ['players'],
-            queryFn: async () => {
-                const response = await axios.get("/api/players");
-                if (response.status !== 200) {
-                    throw new Error("Unable to fetch players");
-                }
-                return response.data;
+    const getPlayersQuery = useQuery({
+        queryKey: ['players'],
+        queryFn: async () => {
+            const response = await axios.get("/api/players");
+            if (response.status !== 200) {
+                throw new Error("Unable to fetch players");
             }
-        }
-    );
+            return response.data;
+        },
+        refetchOnWindowFocus: false,
+    });
 
     const removePlayer = useMutation({
         mutationFn: async (userId) => {
