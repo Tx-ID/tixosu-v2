@@ -13,6 +13,18 @@ export default function roundsPage() {
     // this state machine will be useful
     // my face rn -> https://img.guildedcdn.com/ContentMediaGenericFiles/40040c95218d999c2a2fc51c33e129d9-Full.webp?w=512&h=272
 
+    // 2023-11-05
+    // I fucking hate async
+    // YOU ARE NOT ALLOWED TO SET STATE
+    // THEN TAKE THAT STATE FOR PARAMETERS
+    // ON THE NEXT LINE
+
+    // changeThisState( newValue )
+    // uploadThisState()
+    // ^^^ THIS IS BROKEN
+
+    // time wasted on async crap: 3 hours.
+
     const [last_rounds, setLastRounds] = useState([]);
     const [rounds, setRounds] = useState([]); // { ...round, beatmaps: {} }[]
     const [allowChanges, setChanges] = useState(false);
@@ -25,19 +37,23 @@ export default function roundsPage() {
                 throw new Error("Unable to fetch rounds");
             }
 
-            // console.log("updated!")
-            setRounds(
-                response.data.map((e) => ({
-                    ...e,
-                    date: DateTime.fromISO(e.date),
-                    beatmaps: e.beatmaps || []
-                }))
-            );
-            setLastRounds(rounds.map(e => e));
+            const new_rounds = response.data.map((e) => ({
+                ...e,
+                date: DateTime.fromISO(e.date),
+                beatmaps: e.beatmaps || []
+            }))
+            setRounds(new_rounds)
 
-            return rounds;
+            return new_rounds;
         },
+        refetchOnWindowFocus: false,
+        // refetchOnReconnect: false,
+        // refetchOnMount: false,
     })
+
+    useEffect(() => {
+
+    }, [])
 
     const requestNewRound = useMutation({
         mutationKey: ["new_round"],
@@ -64,12 +80,22 @@ export default function roundsPage() {
 
     const requestUpdateRounds = useMutation({
         mutationKey: ["update_rounds"],
-        mutationFn: async () => {
-            const response = await axios.post(`/api/rounds/update`, rounds);
+        mutationFn: async (new_rounds) => {
+            new_rounds.map((e) => {
+                e.chosen = undefined
+                e.selected = undefined // sortable stuff
+                e.beatmaps.map((m) => {
+                    m.chosen = undefined
+                    m.selected = undefined
+                    return m
+                })
+                return e
+            });
+
+            const response = await axios.post(`/api/rounds/update`, new_rounds);
             if (response.status !== 200) {
                 throw new Error("Unable to update rounds");
             }
-
             return response.data;
         }
     })
@@ -83,7 +109,8 @@ export default function roundsPage() {
             }
             return round;
         });
-        setRounds(e => new_rounds);
+
+        setRounds(new_rounds);
         setChanges(true);
     };
 
@@ -120,6 +147,20 @@ export default function roundsPage() {
                 ? <div>
                     No one but us chickens!
                 </div>
+                // : <div className="flex gap-2 flex-col pb-20">
+                //     {rounds.map((round) => (
+                //         <RoundCard
+                //             key={round.id}
+                //             round={round}
+
+                //             onChange={setChanges}
+                //             onRoundDelete={handleRoundDelete}
+                //             onRoundUpdate={handleRoundUpdate}
+
+                //             isDeleting={requestDeleteRound.variables === round.id}
+                //         />
+                //     ))}
+                // </div>
                 : <ReactSortable className="flex gap-2 flex-col pb-20" list={rounds} setList={e => setRounds(f => e)} animation={150} handle=".round-dragger">
                     {rounds.map((round) => (
                         <RoundCard
@@ -136,8 +177,8 @@ export default function roundsPage() {
                 </ReactSortable>
         }
         <div className="absolute bottom-5 right-0">
-            <button className={"btn " + ((allowChanges && !requestUpdateRounds.isLoading) ? "btn-primary" : "btn-disabled")} onClick={e => requestUpdateRounds.mutate(null, {
-                onSuccess: () => queryRounds.refetch()
+            <button className={"btn " + ((allowChanges && !requestUpdateRounds.isLoading) ? "btn-primary" : "btn-disabled")} onClick={e => requestUpdateRounds.mutate(rounds, {
+                onSuccess: () => { setChanges(false) }
             })}>SAVE CHANGES</button>
         </div>
     </div>)

@@ -29,9 +29,7 @@ const colorMap = {
 };
 
 export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete }) {
-    const [editedBeatmap, setEditedBeatmap] = useState(beatmap);
-
-    const selectedMod = editedBeatmap.mods.toLowerCase();
+    const selectedMod = beatmap.mods.toLowerCase();
     const modStyles = colorMap[selectedMod] || {
         bg: "bg-dark",
         border: "border-dark",
@@ -39,58 +37,50 @@ export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete 
 
     //
 
-    const handleBeatmapUpdate = () => {
-        onBeatmapUpdate(editedBeatmap);
-    }
-
     const handleBeatmapZIndexUpdate = (zindex) => {
-        setEditedBeatmap({
-            ...editedBeatmap,
+        onBeatmapUpdate({
+            ...beatmap,
             zindex: zindex,
         });
-        handleBeatmapUpdate();
     }
 
     const handleBeatmapModsUpdate = (mods) => {
-        setEditedBeatmap(e => ({
-            ...editedBeatmap,
+        onBeatmapUpdate(e => ({
+            ...beatmap,
             mods: mods,
         }));
-        handleBeatmapUpdate();
     }
 
     const handleBeatmapNumberUpdate = (number) => {
-        setEditedBeatmap(e => ({
+        onBeatmapUpdate(e => ({
             ...e,
             "number": parseInt(number),
         }));
-        handleBeatmapUpdate();
     }
 
     const handleBeatmapIdUpdate = (beatmap_id) => {
-        setEditedBeatmap({
-            ...editedBeatmap,
+        onBeatmapUpdate({
+            ...beatmap,
             beatmap_id: beatmap_id,
         });
-        handleBeatmapUpdate();
     }
 
-    return <div key={editedBeatmap.id} className={"rounded-lg flex flex-col p-2 gap-4 bg-opacity-10 " + modStyles.bg + " " + modStyles.border}>
+    return <div key={beatmap.id} className={"rounded-lg flex flex-col p-2 gap-4 bg-opacity-10 " + modStyles.bg + " " + modStyles.border}>
         <div className="flex items-center gap-4 w-full px-4 justify-between">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 map-dragger">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
             </svg>
             <div className="flex flex-col w-20">
                 <label className="label-text text-xs">Mods</label>
-                <input type='text' className="input input-bordered input-sm" value={editedBeatmap.mods} onChange={(e) => handleBeatmapModsUpdate(e.target.value)}></input>
+                <input type='text' className="input input-bordered input-sm" value={beatmap.mods} onChange={(e) => handleBeatmapModsUpdate(e.target.value)}></input>
             </div>
             <div className="flex flex-col w-20">
                 <label className="label-text text-xs">Number</label>
-                <input type='number' className="input input-bordered input-sm" value={editedBeatmap.number} onChange={(e) => handleBeatmapNumberUpdate(e.target.value)}></input>
+                <input type='number' className="input input-bordered input-sm" value={beatmap.number} onChange={(e) => handleBeatmapNumberUpdate(e.target.value)}></input>
             </div>
             <div className="flex flex-col">
                 <label className="label-text text-xs">Beatmap Id</label>
-                <input type='number' className="input input-bordered input-sm" value={editedBeatmap.beatmap_id} onChange={(e) => handleBeatmapIdUpdate(e.target.value)}></input>
+                <input type='number' className="input input-bordered input-sm" value={beatmap.beatmap_id} onChange={(e) => handleBeatmapIdUpdate(e.target.value)}></input>
             </div>
             <div className="flex flex-col text-left mr-auto">
                 <label className="label-text font-bold">Title [Difficulty]</label>
