@@ -36,7 +36,8 @@ CREATE TABLE `team` (
 );
 
 CREATE TABLE `round` (
-    `order` INTEGER PRIMARY KEY,
+    `id` INTEGER PRIMARY KEY,
+    `zindex` INTEGER NOT NULL,
     `name` TEXT NOT NULL,
     `date` TEXT NOT NULL,
     `best_of` INTEGER NOT NULL
@@ -82,11 +83,12 @@ CREATE TABLE `match_ban` (
 );
 
 CREATE TABLE `round_beatmap` (
+    `id` INTEGER NOT NULL PRIMARY KEY,
+    `zindex` INTEGER NOT NULL,
     `number` INTEGER NOT NULL,
     `mod` TEXT NOT NULL,
     `round_id` INTEGER NOT NULL,
-    `beatmap_id` INTEGER NOT NULL,
-    PRIMARY KEY (`round_id`, `mod`, `number`)
+    `beatmap_id` INTEGER NOT NULL
 );
 
 -- CACHE PROFILE_0

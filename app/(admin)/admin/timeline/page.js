@@ -15,6 +15,7 @@ export default function page() {
     const [modal, setModal] = useState(false)
     const [modalType, setModalType] = useState("add")
     const [selectedTimeline, setSelectedTimeline] = useState()
+    const [timelineStatus, setTimelineStatus] = useState({})
 
     const insertTimeline = useMutation({
         mutationFn: async function (timeline) {
@@ -26,37 +27,34 @@ export default function page() {
         }
     })
 
-    const editTimeline = useMutation({
-        mutationFn: async function (timeline) {
-            return true
-        }
-    })
-
     const removeTimeline = useMutation({
         mutationFn: async function (timeline) {
+            const res = await axios.post(`/api/timeline/${timeline.id}/delete`);
+            if (response.status !== 200) {
+                throw new Error("Timeline couldn't be deleted.");
+            }
             return true
         }
     })
 
-    const getTimelineEventsQuery = useQuery(
-        {
-            queryKey: ['events'],
-            queryFn: async () => {
-                const response = await axios.get("/api/timeline")
-                if (response.status !== 200) {
-                    throw new Error("Could not retrieve timeline")
-                }
-                return {
-                    ...response.data,
-                    events: response.data.events.map((e) => ({
-                        ...e,
-                        start: DateTime.fromISO(e.start),
-                        end: DateTime.fromISO(e.end)
-                    }))
-                }
+    const getTimelineEventsQuery = useQuery({
+        queryKey: ['events'],
+        queryFn: async () => {
+            const response = await axios.get("/api/timeline")
+            if (response.status !== 200) {
+                throw new Error("Could not retrieve timeline")
             }
-        }
-    );
+            return {
+                ...response.data,
+                events: response.data.events.map((e) => ({
+                    ...e,
+                    start: DateTime.fromISO(e.start),
+                    end: DateTime.fromISO(e.end)
+                }))
+            }
+        },
+        refetchOnWindowFocus: false,
+    });
 
     return (
         <>
@@ -64,10 +62,13 @@ export default function page() {
                 <div className="relative z-20 m-auto flex bg-dark rounded-lg">
                     <div className="p-4 flex flex-col">
                         {modalType === "add"
-                            ? <AddTimelineWindow isLoading={insertTimeline.isLoading}
+                            ? <AddTimelineWindow isLoading={insertTimeline.status === "loading"}
                                 submitFn={(timeline) => {
                                     insertTimeline.mutate(timeline, {
-                                        onSuccess: () => { getTimelineEventsQuery.refetch() }
+                                        onSuccess: () => {
+                                            getTimelineEventsQuery.refetch()
+                                            setModal(false)
+                                        }
                                     })
                                 }} />
                             : <>Unknown modal type: {modalType}</>
@@ -76,7 +77,7 @@ export default function page() {
                 </div>
             </Modal>
             <div className="flex flex-row justify-between w-full">
-                <h1 className="text-3xl text-white font-bold">Sheets</h1>
+                <h1 className="text-3xl text-white font-bold">Timeline</h1>
                 <button onClick={(e) => { setModal(true) }} className="btn btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth={1.5} className="w-3 h-3 stroke-white">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -105,8 +106,29 @@ export default function page() {
                             <th className="bg-dark">{DateTime.fromISO(event.end).toFormat("dd LLL yyyy")}</th>
                             <th className="bg-dark"></th>
                             <th className="bg-dark flex justify-end gap-4">
-                                <button className="btn ml-auto btn-sm">EDIT</button>
-                                <button className="btn btn-sm">DELETE</button>
+                                {/* <button className="btn ml-auto btn-sm">EDIT</button> */}
+                                <button onClick={() => {
+                                    if (timelineStatus[event.id] === 1 || getTimelineEventsQuery.status !== "success") return;
+
+                                    setTimelineStatus({
+                                        ...timelineStatus,
+                                        [event.id]: 1,
+                                    })
+                                    removeTimeline.mutate(event, {
+                                        onSuccess: () => {
+                                            getTimelineEventsQuery.refetch();
+                                        },
+                                        onSettled: () => {
+                                            setTimelineStatus({
+                                                ...timelineStatus,
+                                                [event.id]: 0,
+                                            })
+                                        },
+                                    })
+                                }} className="btn btn-sm btn-warning">
+                                    <span className={"loading loading-spinner h-4 w-4 " + (timelineStatus[event.id] === 1 ? "" : "hidden")}></span>
+                                    <p className={(timelineStatus[event.id] === 1 ? "hidden" : "")}>DELETE</p>
+                                </button>
                             </th>
                         </tr>
                     )) : <tr key={"RAWR"} className="border-zinc-900">
@@ -118,7 +140,7 @@ export default function page() {
                         <th className="bg-dark"></th>
                     </tr>}
                 </tbody>
-            </table>
+            </table >
         </>
     )
 }

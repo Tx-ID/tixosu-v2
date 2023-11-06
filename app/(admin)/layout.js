@@ -15,7 +15,7 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en" data-theme="dark">
-      <body className={"min-h-screen max-w-screen-xl mx-auto text-default-white " + lexend.className}>
+      <body className={"h-screen max-w-screen-xl mx-auto text-default-white " + lexend.className}>
         {children}
       </body>
     </html>

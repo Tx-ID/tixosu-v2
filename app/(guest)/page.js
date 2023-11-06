@@ -71,8 +71,8 @@ export default function Home() {
     <div className="mx-2 flex flex-col items-start">
       <img className="w-full" src="https://cdn.discordapp.com/attachments/856213034716758036/1158702564141973534/IMG_3414.JPG?ex=651d355a&is=651be3da&hm=89d37764da8debf72db294ea8fc268e650301a76912d7966280fa016eced23c8&"></img>
       <div className="w-full flex flex-col md:flex-row mt-4">
-        <div className="overflow-x-auto flex-grow">
-          <table className="table">
+        <div className="overflow-x-auto">
+          <table className="table w-fit max-w-md">
             <thead>
               <tr>
                 <th>Date Range</th>
@@ -105,7 +105,19 @@ export default function Home() {
               </button>
               {
                 session.data.user.is_participant
-                  ? <span>{session.data.user.id} is participant</span>
+                  ? <button disabled className='btn btn-disabled md:btn-block flex flex-col gap-0 normal-case'>
+                    <p className='mt-2'>Register as Participant</p>
+                    <div className="mb-1 flex gap-1 text-center font-normal">
+                      {["days", "hours", "minutes", "seconds"].map((value, index) => (
+                        <div key={index} className='flex items-center text-xs'>
+                          <span className="countdown font-mono">
+                            <span className='' style={{ "--value": registrationEndsIn.get(value) }}></span>
+                          </span>
+                          <p className=''>{value.substring(0, 1)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </button>
                   : (
                     <button
                       className='btn md:btn-block flex flex-col gap-0 normal-case bg-primary hover:bg-primary-dark text-white'

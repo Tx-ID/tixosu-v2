@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-body, :root {
+body,
+:root {
     background-color: rgb(20, 20, 20);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
