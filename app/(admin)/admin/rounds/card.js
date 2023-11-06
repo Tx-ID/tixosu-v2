@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import BeatmapCard from "./beatmap"
 
-export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting }) {
+export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting, onBeatmapIdUpdate, beatmapsWithAttributes, setChanges }) {
     const handleRoundNameUpdate = (name) => {
         onRoundUpdate({
             ...round,
@@ -34,14 +34,24 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting }
         onRoundUpdate({ ...round, beatmaps: new_beatmaps.map((beatmap, index) => ({ ...beatmap, zindex: index + 1 })) });
     }
 
+    useEffect(() => {
+        setChanges(false); // mandatory to prevent Sortable sets changes to true
+    }, [])
+
     const handleMapUpdate = (new_map) => {
+        var pendingUpdate = false;
         const updated_maps = round.beatmaps.map((beatmap) => {
             if (beatmap.id === new_map.id) {
+                if (beatmap.beatmap_id !== new_map.beatmap_id || beatmap.mods !== new_map.mods)
+                    pendingUpdate = true;
                 return new_map;
             }
             return beatmap;
         });
         onRoundUpdate({ ...round, beatmaps: updated_maps });
+
+        if (pendingUpdate)
+            onBeatmapIdUpdate();
     };
 
     const handleMapCreate = () => {
@@ -52,7 +62,7 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting }
             id: newMapId,
             zindex: newZIndex,
             number: 1,
-            mods: "",
+            mods: "NM",
             round_id: round.id,
             beatmap_id: 0,
         };
@@ -71,8 +81,6 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting }
             beatmaps: updated_maps,
         })
     };
-
-    // console.log(round)
 
     return <div key={toString(round.id)} className={"bg-zinc-900 rounded-lg flex flex-col pt-4 gap-4 " + (round.beatmaps.length <= 0 ? "pb-4" : "pb-2")}>
         <div className="flex items-center gap-4 w-full px-4 justify-between">
@@ -101,28 +109,18 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting }
         {round.beatmaps.length <= 0 ? "" :
             <div className="bg-dark w-full p-4">
                 <ReactSortable className="flex gap-1 flex-col" list={round.beatmaps} setList={handleMapZIndexUpdate} animation={150} fallbackOnBody swapThreshold={0.65} direction={"vertical"} handle=".map-dragger">
-                    {round.beatmaps.map((beatmap, index) => (
+                    {round.beatmaps.sort((a, b) => a.zindex < b.zindex).map((beatmap, index) => (
                         <BeatmapCard
-                            key={index}
+                            key={beatmap.id}
 
                             beatmap={beatmap}
                             onBeatmapUpdate={handleMapUpdate}
                             onBeatmapDelete={handleMapDelete}
+
+                            beatmapDataWithAttributes={...beatmapsWithAttributes.filter(bm => bm.id === beatmap.beatmap_id && bm.mods === beatmap.mods)[0]}
                         />
                     ))}
                 </ReactSortable>
-
-                {/* <div className="flex gap-1 flex-col">
-                    {round.beatmaps.map((beatmap, index) => (
-                        <BeatmapCard
-                            key={index}
-
-                            beatmap={beatmap}
-                            onBeatmapUpdate={handleMapUpdate}
-                            onBeatmapDelete={handleMapDelete}
-                        />
-                    ))}
-                </div> */}
             </div>
         }
     </div>

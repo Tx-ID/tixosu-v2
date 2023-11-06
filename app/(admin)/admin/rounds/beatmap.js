@@ -28,7 +28,7 @@ const colorMap = {
     },
 };
 
-export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete }) {
+export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete, beatmapDataWithAttributes }) {
     const selectedMod = beatmap.mods.toLowerCase();
     const modStyles = colorMap[selectedMod] || {
         bg: "bg-dark",
@@ -40,39 +40,39 @@ export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete 
     const handleBeatmapZIndexUpdate = (zindex) => {
         onBeatmapUpdate({
             ...beatmap,
-            zindex: zindex,
+            'zindex': zindex,
         });
     }
 
     const handleBeatmapModsUpdate = (mods) => {
-        onBeatmapUpdate(e => ({
+        onBeatmapUpdate({
             ...beatmap,
-            mods: mods,
-        }));
+            'mods': mods,
+        });
     }
 
     const handleBeatmapNumberUpdate = (number) => {
-        onBeatmapUpdate(e => ({
+        onBeatmapUpdate({
             ...e,
-            "number": parseInt(number),
-        }));
+            "number": number,
+        });
     }
 
     const handleBeatmapIdUpdate = (beatmap_id) => {
         onBeatmapUpdate({
             ...beatmap,
-            beatmap_id: beatmap_id,
+            'beatmap_id': Math.max(0, parseInt(beatmap_id)),
         });
     }
 
-    return <div key={beatmap.id} className={"rounded-lg flex flex-col p-2 gap-4 bg-opacity-10 " + modStyles.bg + " " + modStyles.border}>
+    return <div key={beatmap.id} className={"rounded-lg flex flex-col gap-4 bg-opacity-10 " + modStyles.bg + " " + modStyles.border + " " + (!beatmapDataWithAttributes ? "p-2" : "")}>
         <div className="flex items-center gap-4 w-full px-4 justify-between">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 map-dragger">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
             </svg>
             <div className="flex flex-col w-20">
                 <label className="label-text text-xs">Mods</label>
-                <input type='text' className="input input-bordered input-sm" value={beatmap.mods} onChange={(e) => handleBeatmapModsUpdate(e.target.value)}></input>
+                <input type="text" className="input input-bordered input-sm" value={beatmap.mods} onChange={(e) => handleBeatmapModsUpdate(e.target.value)}></input>
             </div>
             <div className="flex flex-col w-20">
                 <label className="label-text text-xs">Number</label>
@@ -82,13 +82,17 @@ export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete 
                 <label className="label-text text-xs">Beatmap Id</label>
                 <input type='number' className="input input-bordered input-sm" value={beatmap.beatmap_id} onChange={(e) => handleBeatmapIdUpdate(e.target.value)}></input>
             </div>
-            <div className="flex flex-col text-left mr-auto">
-                <label className="label-text font-bold">Title [Difficulty]</label>
-                <label className="label-text text-xs text-zinc-500">artist <b className="text-neutral-content">Artist</b> mapper <b className="text-neutral-content">Creator</b></label>
-            </div>
+            {!beatmapDataWithAttributes
+                ? <span className="mr-auto py-4 px-4"><p className="opacity-0">invisible label</p></span>
+                : <div className="flex flex-col text-left mr-auto relative py-4 px-4">
+                    <label className="label-text font-bold z-10">{beatmapDataWithAttributes.title} [{beatmapDataWithAttributes.difficulty}]</label>
+                    <div className="label-text text-xs text-zinc-500 z-10">artist <b className="text-neutral-content">{beatmapDataWithAttributes.artist}</b> <a href={"https://osu.ppy.sh/u/" + beatmapDataWithAttributes.creator_id}>mapper <b className="text-neutral-content">{beatmapDataWithAttributes.creator}</b></a></div>
+                    <div className="absolute left-0 top-0 w-full h-full z-0"><img className="h-full w-full object-cover brightness-[20%]" src={beatmapDataWithAttributes.covers.cover}></img></div>
+                </div>
+            }
             <div className="flex items-center">
                 <button
-                    onClick={onBeatmapDelete}
+                    onClick={e => onBeatmapDelete(beatmap.id)}
                     className="btn btn-neutral btn-sm"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">

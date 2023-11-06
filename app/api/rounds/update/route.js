@@ -6,11 +6,10 @@ import { DateTime } from "luxon";
 
 export async function POST(req) {
     const edited_rounds = await req.json();
-    console.log(edited_rounds)
 
-    // const client = turso.create();
-    // const newRound = await rounds.addRound(client);
-    // client.close();
+    const client = turso.create();
+    await rounds.updateRoundBeatmaps(client, edited_rounds)
+    client.close();
 
     return NextResponse.json({ content: DateTime.now().toSeconds() });
 }

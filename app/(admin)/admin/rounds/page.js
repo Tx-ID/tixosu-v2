@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import RoundCard from "./card"
+import { updateRoundBeatmaps } from "@/lib/rounds";
 
 export default function roundsPage() {
 
@@ -25,9 +26,9 @@ export default function roundsPage() {
 
     // time wasted on async crap: 3 hours.
 
-    const [last_rounds, setLastRounds] = useState([]);
     const [rounds, setRounds] = useState([]); // { ...round, beatmaps: {} }[]
     const [allowChanges, setChanges] = useState(false);
+    const [beatmapDatas, setBeatmapDatas] = useState({});
 
     const queryRounds = useQuery({
         queryKey: ['rounds'],
@@ -40,20 +41,49 @@ export default function roundsPage() {
             const new_rounds = response.data.map((e) => ({
                 ...e,
                 date: DateTime.fromISO(e.date),
-                beatmaps: e.beatmaps || []
-            }))
-            setRounds(new_rounds)
+                beatmaps: (e.beatmaps || []).map(bm => ({
+                    ...bm,
+                    mods: bm.mod,
+                    mod: undefined,
+                }))
+            })).sort((a, b) => a.zindex < b.zindex);
+            setRounds(new_rounds);
 
             return new_rounds;
         },
         refetchOnWindowFocus: false,
-        // refetchOnReconnect: false,
-        // refetchOnMount: false,
     })
 
-    useEffect(() => {
+    const availableMods = ["NM", "NF", "HD", "HR", "DT", "FM", "TB"];
 
-    }, [])
+    const queryBeatmaps = useQuery({
+        queryKey: ["read_beatmaps"],
+        queryFn: async () => {
+            const get_beatmaps = rounds.reduce((array, r) => {
+                r.beatmaps.filter(bm => (bm.beatmap_id > 0 && availableMods.includes(bm.mods))).map(bm => {
+                    array.push({ beatmap_id: bm.beatmap_id, mods: bm.mods })
+                })
+                return array;
+            }, [])
+
+            const responses = await Promise.all(
+                get_beatmaps.map(bm =>
+                    axios.post("/api/beatmaps", { BeatmapId: bm.beatmap_id, Mods: bm.mods })
+                )
+            ).catch(e => {
+                console.log(e)
+                return "ERROR"
+            })
+
+            if (responses === "ERROR") {
+                throw new Error("Unable to fetch beatmaps");
+            }
+
+            const beatmaps = responses.map(e => e.data)
+            return beatmaps
+        },
+        refetchOnWindowFocus: false,
+    })
 
     const requestNewRound = useMutation({
         mutationKey: ["new_round"],
@@ -81,14 +111,16 @@ export default function roundsPage() {
     const requestUpdateRounds = useMutation({
         mutationKey: ["update_rounds"],
         mutationFn: async (new_rounds) => {
-            new_rounds.map((e) => {
+            new_rounds.map((e, index) => {
                 e.chosen = undefined
                 e.selected = undefined // sortable stuff
-                e.beatmaps.map((m) => {
+                e.beatmaps.map((m, mindex) => {
                     m.chosen = undefined
                     m.selected = undefined
+                    m.zindex = mindex + 1
                     return m
                 })
+                e.zindex = index + 1
                 return e
             });
 
@@ -102,16 +134,34 @@ export default function roundsPage() {
 
     //
 
+    const [updateBeatmaps, setUpdateBeatmaps] = useState(false);
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (updateBeatmaps) {
+                setUpdateBeatmaps(false);
+            }
+            queryBeatmaps.refetch();
+        }, 1000)
+        return () => clearTimeout(delayDebounceFn)
+    }, [updateBeatmaps, rounds])
+
+    const handleBeatmapIdUpdate = () => {
+        setUpdateBeatmaps(true);
+    }
+
     const handleRoundUpdate = (new_round) => {
+        var canChange = false;
         const new_rounds = rounds.map((round) => {
             if (round.id === new_round.id) {
+                canChange = true;
                 return new_round;
             }
             return round;
         });
 
         setRounds(new_rounds);
-        setChanges(true);
+        setChanges(canChange);
     };
 
     const handleRoundDelete = (round_id) => {
@@ -147,29 +197,18 @@ export default function roundsPage() {
                 ? <div>
                     No one but us chickens!
                 </div>
-                // : <div className="flex gap-2 flex-col pb-20">
-                //     {rounds.map((round) => (
-                //         <RoundCard
-                //             key={round.id}
-                //             round={round}
-
-                //             onChange={setChanges}
-                //             onRoundDelete={handleRoundDelete}
-                //             onRoundUpdate={handleRoundUpdate}
-
-                //             isDeleting={requestDeleteRound.variables === round.id}
-                //         />
-                //     ))}
-                // </div>
-                : <ReactSortable className="flex gap-2 flex-col pb-20" list={rounds} setList={e => setRounds(f => e)} animation={150} handle=".round-dragger">
+                : <ReactSortable className="flex gap-2 flex-col pb-20" list={rounds} setList={setRounds} onChange={e => setChanges(true)} animation={150} handle=".round-dragger">
                     {rounds.map((round) => (
                         <RoundCard
                             key={round.id}
                             round={round}
 
-                            onChange={setChanges}
+                            setChanges={setChanges}
                             onRoundDelete={handleRoundDelete}
                             onRoundUpdate={handleRoundUpdate}
+                            onBeatmapIdUpdate={handleBeatmapIdUpdate}
+
+                            beatmapsWithAttributes={queryBeatmaps.data}
 
                             isDeleting={requestDeleteRound.variables === round.id}
                         />
@@ -177,9 +216,9 @@ export default function roundsPage() {
                 </ReactSortable>
         }
         <div className="absolute bottom-5 right-0">
-            <button className={"btn " + ((allowChanges && !requestUpdateRounds.isLoading) ? "btn-primary" : "btn-disabled")} onClick={e => requestUpdateRounds.mutate(rounds, {
-                onSuccess: () => { setChanges(false) }
-            })}>SAVE CHANGES</button>
+            <button className={"btn " + ((allowChanges && requestUpdateRounds.status !== "loading") ? "btn-primary" : "btn-disabled")} onClick={e => requestUpdateRounds.mutate(rounds, {
+                onSuccess: () => { queryRounds.refetch(); setChanges(false) }
+            })}>{requestUpdateRounds.status === "loading" ? <span className="loading loading-spinner"></span> : "SAVE CHANGES"}</button>
         </div>
     </div>)
 }
