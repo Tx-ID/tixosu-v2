@@ -10,7 +10,7 @@ export async function POST(req, { params }) {
     const body = req.body.json();
 
     const client = turso.create();
-    rounds.updateRoundBeatmaps(client, body.beatmaps);
+    await rounds.updateRoundBeatmaps(client, body.beatmaps);
     client.close();
 
     return NextResponse.json({ content: DateTime.now().toSeconds() })
