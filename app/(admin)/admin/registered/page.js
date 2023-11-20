@@ -44,8 +44,18 @@ export default function page() {
     })
 
     return (
-        <div className="overflow-auto">
-            <h1 className="text-3xl text-white font-bold mb-4">Players</h1>
+        <div className="overflow-auto w-fit">
+            <h1 className="text-3xl text-white font-bold mb-4 flex flex-row justify-between items-baseline">
+                <p>Players</p>
+                <button
+                    className={"btn btn-neutral btn-xs w-fit " + (getPlayersQuery.isLoading ? "btn-disabled" : "")}
+                    onClick={() => {
+                        getPlayersQuery.refetch();
+                    }}
+                >
+                    refresh
+                </button>
+            </h1>
             <div className="bg-zinc-900 w-fit rounded-lg pb-2">
                 <table className="table w-fit table-xs">
                     <thead>
@@ -61,7 +71,7 @@ export default function page() {
                         {/* my own genius sometimes scares me. */}
                         {getPlayersQuery.status !== "success"
                             ? <tr key={"loading"} className="border-b-0 bg-dark">
-                                <td colSpan="6"><span className="loading loading-spinner h-8"></span></td>
+                                <td colSpan="6" className="w-96"><span className="loading loading-spinner h-8"></span></td>
                             </tr>
                             : Object.values(getPlayersQuery.data.players).length > 0
                                 ? ""
