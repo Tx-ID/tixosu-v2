@@ -46,12 +46,13 @@ export default function roundsPage() {
                     mods: bm.mod,
                     mod: undefined,
                 }))
-            })).sort((a, b) => a.zindex < b.zindex);
+            })).sort((a, b) => a.zindex > b.zindex);
             setRounds(new_rounds);
 
             return new_rounds;
         },
         refetchOnWindowFocus: false,
+        cacheTime: 1,
     })
 
     const availableMods = ["NM", "NF", "HD", "HR", "DT", "FM", "TB"];

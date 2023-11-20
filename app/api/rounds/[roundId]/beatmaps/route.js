@@ -1,3 +1,4 @@
+export const revalidate = 0;
 
 import * as rounds from "@/lib/rounds";
 import * as turso from "@/lib/turso"
