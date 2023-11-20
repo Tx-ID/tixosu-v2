@@ -6,8 +6,6 @@ import { redirect } from "next/navigation"
 
 const lexend = Lexend({ subsets: ['latin'] })
 
-export const revalidate = 0;
-
 export default async function RootLayout({ children }) {
   const session = await auth.auth();
   if (session?.user.is_admin === false) {
