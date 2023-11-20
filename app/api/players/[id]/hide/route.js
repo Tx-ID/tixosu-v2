@@ -17,7 +17,7 @@ export async function POST(req, { params }) {
     }
 
     const tursoClient = Turso.create();
-    Players.hidePlayerFromRegistered(tursoClient, id);
+    await Players.hidePlayerFromRegistered(tursoClient, id);
 
     tursoClient.close();
 
