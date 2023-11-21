@@ -40,7 +40,8 @@ CREATE TABLE `round` (
     `zindex` INTEGER NOT NULL,
     `name` TEXT NOT NULL,
     `date` TEXT NOT NULL,
-    `best_of` INTEGER NOT NULL
+    `best_of` INTEGER NOT NULL,
+    `visible` BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE `match` (

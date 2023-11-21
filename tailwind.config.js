@@ -29,5 +29,8 @@ module.exports = {
     themes: ["cupcake", "dark", "cmyk"],
   },
 
-  plugins: [require('daisyui')],
+  plugins: [
+    require('daisyui'),
+    require('@tailwindcss/typography'),
+  ],
 }

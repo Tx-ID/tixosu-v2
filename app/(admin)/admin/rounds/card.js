@@ -6,7 +6,10 @@ import { useEffect, useState } from "react";
 
 import BeatmapCard from "./beatmap"
 
-export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting, onBeatmapIdUpdate, beatmapsWithAttributes, setChanges }) {
+export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting,
+    onBeatmapIdUpdate, beatmapsWithAttributes,
+    setChanges, lastBeatmapId, setLastBeatmapId
+}) {
     const handleRoundNameUpdate = (name) => {
         onRoundUpdate({
             ...round,
@@ -55,7 +58,7 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting, 
     };
 
     const handleMapCreate = () => {
-        const newMapId = round.beatmaps.length > 0 ? Math.max(...round.beatmaps.map((map) => map.id)) + 1 : 1;
+        const newMapId = lastBeatmapId + 1;
         const newZIndex = round.beatmaps.length > 0 ? Math.max(...round.beatmaps.map((map) => map.zindex)) + 1 : 1;
 
         const newMap = {
@@ -71,6 +74,7 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting, 
             ...round,
             beatmaps: [...round.beatmaps, newMap]
         })
+        setLastBeatmapId((e) => e + 1);
     };
 
     const handleMapDelete = (id) => {

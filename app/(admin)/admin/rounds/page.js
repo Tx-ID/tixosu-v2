@@ -29,6 +29,7 @@ export default function roundsPage() {
     const [rounds, setRounds] = useState([]); // { ...round, beatmaps: {} }[]
     const [allowChanges, setChanges] = useState(false);
     const [beatmapDatas, setBeatmapDatas] = useState({});
+    const [lastBeatmapId, setLastBeatmapId] = useState(0);
 
     const queryRounds = useQuery({
         queryKey: ['rounds'],
@@ -49,10 +50,17 @@ export default function roundsPage() {
             })).sort((a, b) => a.zindex > b.zindex);
             setRounds(new_rounds);
 
+            let maxId = 0
+            new_rounds.forEach((e) => {
+                e.beatmaps.sort((a, b) => a.id < b.id)
+                let id = e.beatmaps[0]?.id ?? 0
+                maxId = Math.max(id, maxId)
+            })
+            setLastBeatmapId(maxId)
+
             return new_rounds;
         },
         refetchOnWindowFocus: false,
-        cacheTime: 1,
     })
 
     const availableMods = ["NM", "NF", "HD", "HR", "DT", "FM", "TB"];
@@ -208,6 +216,8 @@ export default function roundsPage() {
                             onRoundDelete={handleRoundDelete}
                             onRoundUpdate={handleRoundUpdate}
                             onBeatmapIdUpdate={handleBeatmapIdUpdate}
+                            lastBeatmapId={lastBeatmapId}
+                            setLastBeatmapId={setLastBeatmapId}
 
                             beatmapsWithAttributes={queryBeatmaps.data}
 
