@@ -25,6 +25,8 @@ export default function Template({ children, session }) {
     ["Teams", "/admin/teams"],
     ["Rounds", "/admin/rounds"],
     ["Timeline", '/admin/timeline'],
+    ["Matches", "/admin/matches"],
+    ["Settings", "/admin/settings"],
   ]
 
   return (
