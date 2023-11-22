@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
+const extraColumns = 24;
+
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -8,6 +10,17 @@ module.exports = {
   ],
   theme: {
     extend: {
+      gridColumn: [extraColumns].reduce((dict, target) => {
+        for (let i = 13; i <= target; i++)
+          dict[`span-${i}`] = `span ${i} / span ${i}`
+        return dict;
+      }, {}),
+      gridTemplateColumns: [extraColumns].reduce((dict, target) => {
+        for (let i = 13; i <= target; i++)
+          dict[`${i}`] = `repeat(${i}, minmax(0, 1fr))`
+        return dict;
+      }, {}),
+
       backgroundImage: {},
       colors: {
         ...require('tailwindcss/colors'),
@@ -29,5 +42,8 @@ module.exports = {
     themes: ["cupcake", "dark", "cmyk"],
   },
 
-  plugins: [require('daisyui')],
+  plugins: [
+    require('daisyui'),
+    require('@tailwindcss/typography'),
+  ],
 }

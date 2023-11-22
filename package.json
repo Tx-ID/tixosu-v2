@@ -25,12 +25,15 @@
     "next-auth": "^4.23.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-markdown": "^9.0.1",
     "react-sortablejs": "^6.1.4",
+    "remark-gfm": "^4.0.0",
     "sortablejs": "^1.15.0",
     "supports-color": "^9.4.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
     "@types/sortablejs": "^1.15.4",
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.8.3",

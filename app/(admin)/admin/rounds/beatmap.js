@@ -28,6 +28,15 @@ const colorMap = {
     },
 };
 
+function formatTime(sec) {
+    const date = new Date(sec * 1000);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${minutes}:${seconds}`;
+}
+
 export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete, beatmapDataWithAttributes }) {
     const selectedMod = beatmap.mods.toLowerCase();
     const modStyles = colorMap[selectedMod] || {
@@ -65,31 +74,51 @@ export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete,
         });
     }
 
-    return <div key={beatmap.id} className={"rounded-lg flex flex-col gap-4 bg-opacity-10 " + modStyles.bg + " " + modStyles.border + " " + (!beatmapDataWithAttributes ? "p-2" : "")}>
-        <div className="flex items-center gap-4 w-full px-4 justify-between">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-[24px] h-[24px] map-dragger">
+    const attributes = beatmapDataWithAttributes ? beatmapDataWithAttributes.attributes : {};
+    // console.log(attributes)
+
+    return <div key={beatmap.id} className={"rounded-lg flex flex-col gap-4 bg-opacity-10 " + modStyles.bg + " " + modStyles.border + " " + (!beatmapDataWithAttributes ? "" : "")}>
+        <div className="px-4 grid grid-cols-24 gap-2 align-middle items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="map-dragger w-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
             </svg>
-            <div className="flex flex-col w-20">
+            <div className="flex flex-col col-span-2">
                 <label className="label-text text-xs">Mods</label>
                 <input type="text" className="input input-bordered input-sm" value={beatmap.mods} onChange={(e) => handleBeatmapModsUpdate(e.target.value)}></input>
             </div>
-            <div className="flex flex-col w-20">
+            <div className="flex flex-col col-span-2">
                 <label className="label-text text-xs">Number</label>
                 <input type='number' className="input input-bordered input-sm" value={beatmap.number} onChange={(e) => handleBeatmapNumberUpdate(e.target.value)}></input>
             </div>
-            <div className="flex flex-col w-32">
+            <div className="flex flex-col col-span-3">
                 <label className="label-text text-xs">Beatmap Id</label>
                 <input type='number' className="input input-bordered input-sm" value={beatmap.beatmap_id} onChange={(e) => handleBeatmapIdUpdate(e.target.value)}></input>
             </div>
-            {!beatmapDataWithAttributes
-                ? <span className="w-full py-4 px-4"><p>invisible label</p></span>
-                : <div className="w-full flex flex-col text-left relative py-4 px-4">
-                    <label className="label-text font-bold z-10 truncate">{beatmapDataWithAttributes.title} [{beatmapDataWithAttributes.difficulty}]</label>
-                    <div className="label-text text-xs text-zinc-500 z-10">artist <b className="text-neutral-content">{beatmapDataWithAttributes.artist}</b> <a href={"https://osu.ppy.sh/u/" + beatmapDataWithAttributes.creator_id}>mapper <b className="text-neutral-content">{beatmapDataWithAttributes.creator}</b></a></div>
-                    <div className="absolute left-0 top-0 w-full h-full z-0"><img className="h-full w-full object-cover brightness-[20%]" src={beatmapDataWithAttributes.covers.cover}></img></div>
-                </div>
-            }
+            <div className="flex flex-col col-span-15">
+                {!beatmapDataWithAttributes
+                    ? <span className="h-16"><p className="opacity-0">invisible label</p></span>
+                    : <div className="flex flex-col justify-center px-2 relative col-span-15 h-16">
+                        <div className="grid grid-cols-6 z-10">
+                            {/* {JSON.stringify(beatmapDataWithAttributes)} */}
+                            <div className="col-span-4">
+                                <a href={beatmapDataWithAttributes.url} className="font-bold"><p className="truncate">{beatmapDataWithAttributes.title}</p></a>
+                                <div className="label-text text-xs text-zinc-500">difficulty <b className="text-neutral-content">{beatmapDataWithAttributes.difficulty}</b> artist <b className="text-neutral-content">{beatmapDataWithAttributes.artist}</b> <a href={"https://osu.ppy.sh/u/" + beatmapDataWithAttributes.creator_id}>mapper <b className="text-neutral-content">{beatmapDataWithAttributes.creator}</b></a></div>
+                            </div>
+                            <div className="flex flex-col items-end justify-center text-xs col-span-2">
+                                <div className="flex gap-1"><p>length</p><p className=" font-bold">{formatTime(attributes.hit_length)}</p></div>
+                                <div className="flex gap-2">
+                                    <div className="flex flex-row gap-1"><p>ar</p><p className=" font-bold">{attributes.ar}</p></div>
+                                    <div className="flex flex-row gap-1"><p>cs</p><p className=" font-bold">{attributes.cs}</p></div>
+                                    <div className="flex flex-row gap-1"><p>od</p><p className=" font-bold">{attributes.od}</p></div>
+                                    <div className="flex flex-row gap-1"><p>hp</p><p className=" font-bold">{attributes.hp}</p></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="absolute left-0 top-0 w-full h-full z-0"><img className="h-full w-full object-cover brightness-[20%]" src={beatmapDataWithAttributes.covers.cover}></img></div>
+                    </div>
+                }
+            </div>
             <div className="flex items-center">
                 <button
                     onClick={e => onBeatmapDelete(beatmap.id)}
