@@ -80,8 +80,8 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {(getTimelineEventsQuery.data?.events ?? []).map((event) => (
-                <tr>
+              {(getTimelineEventsQuery.data?.events ?? []).map((event, index) => (
+                <tr key={`timeIndex_` + index}>
                   <th>{event.start.toFormat('dd LLL yyyy')} - {event.end.toFormat('dd LLL yyyy')}</th>
                   <th>{event.name}</th>
                 </tr>

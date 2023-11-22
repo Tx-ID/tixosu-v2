@@ -53,9 +53,9 @@ export default function roundsPage() {
 
             let maxId = 0
             new_rounds.forEach((e) => {
-                e.beatmaps.sort((a, b) => a.id < b.id)
-                let id = e.beatmaps[0]?.id ?? 0
-                maxId = Math.max(id, maxId)
+                e.beatmaps.forEach((bm) => {
+                    maxId = Math.max(maxId, bm.id)
+                })
             })
             setLastBeatmapId(maxId)
 
@@ -89,7 +89,13 @@ export default function roundsPage() {
                 throw new Error("Unable to fetch beatmaps");
             }
 
-            const beatmaps = responses.map(e => e.data)
+            const beatmaps = responses.map(e => {
+                let data = e.data
+                return {
+                    ...data,
+                    id: parseInt(data.id),
+                }
+            })
             return beatmaps
         },
         refetchOnWindowFocus: false,
@@ -142,6 +148,18 @@ export default function roundsPage() {
         }
     })
 
+    const requestDeleteCache = useMutation({
+        mutationKey: ['delete_beatmap_cache'],
+        mutationFn: async () => {
+            const response = await axios.post(`/api/beatmaps/clear`);
+            if (response.status !== 200)
+                throw new Error("Unable to update rounds");
+
+            queryBeatmaps.refetch();
+            return response.data;
+        }
+    })
+
     //
 
     const [updateBeatmaps, setUpdateBeatmaps] = useState(false);
@@ -185,18 +203,27 @@ export default function roundsPage() {
     return (<div className="overflow-auto relative h-full min-w-fit">
         <h1 className="text-3xl text-white font-bold mb-4 flex flex-row justify-between items-center">
             <p>Rounds</p>
-            <button
-                className={"btn btn-neutral btn-xs w-fit mr-4 " + (requestNewRound.isLoading ? "btn-disabled" : "")}
-                onClick={() => {
-                    requestNewRound.mutate(null, {
-                        onSettled: () => {
-                            queryRounds.refetch();
-                        }
-                    })
-                }}
-            >
-                add round
-            </button>
+            <div className="flex flex-row gap-2 justify-end items-baseline">
+                <button
+                    className={"btn btn-warning btn-xs w-fit " + (requestDeleteCache.isLoading ? "btn-disabled" : "")}
+                    onClick={() => requestDeleteCache.mutate()}
+                >
+                    delete cache
+                </button>
+                <button
+                    className={"btn btn-neutral btn-xs w-fit " + (requestNewRound.isLoading ? "btn-disabled" : "")}
+                    onClick={() => {
+                        requestNewRound.mutate(null, {
+                            onSettled: () => {
+                                queryRounds.refetch();
+                            }
+                        })
+                    }}
+                >
+                    add round
+                </button>
+            </div>
+
         </h1>
 
         {(queryRounds.status !== "success")

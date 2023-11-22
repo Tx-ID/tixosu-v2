@@ -28,6 +28,15 @@ const colorMap = {
     },
 };
 
+function formatTime(sec) {
+    const date = new Date(sec * 1000);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${minutes}:${seconds}`;
+}
+
 export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete, beatmapDataWithAttributes }) {
     const selectedMod = beatmap.mods.toLowerCase();
     const modStyles = colorMap[selectedMod] || {
@@ -65,6 +74,9 @@ export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete,
         });
     }
 
+    const attributes = beatmapDataWithAttributes ? beatmapDataWithAttributes.attributes : {};
+    // console.log(attributes)
+
     return <div key={beatmap.id} className={"rounded-lg flex flex-col gap-4 bg-opacity-10 " + modStyles.bg + " " + modStyles.border + " " + (!beatmapDataWithAttributes ? "" : "")}>
         <div className="px-4 grid grid-cols-24 gap-2 align-middle items-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="map-dragger w-5">
@@ -86,19 +98,19 @@ export default function beatmapCard({ beatmap, onBeatmapUpdate, onBeatmapDelete,
                 {!beatmapDataWithAttributes
                     ? <span className="h-16"><p className="opacity-0">invisible label</p></span>
                     : <div className="flex flex-col justify-center px-2 relative col-span-15 h-16">
-                        <div className="grid grid-cols-2 z-10">
+                        <div className="grid grid-cols-6 z-10">
                             {/* {JSON.stringify(beatmapDataWithAttributes)} */}
-                            <div>
-                                <a href={beatmapDataWithAttributes.url} className="label-text font-bold truncate">{beatmapDataWithAttributes.title} [{beatmapDataWithAttributes.difficulty}]</a>
-                                <div className="label-text text-xs text-zinc-500">artist <b className="text-neutral-content">{beatmapDataWithAttributes.artist}</b> <a href={"https://osu.ppy.sh/u/" + beatmapDataWithAttributes.creator_id}>mapper <b className="text-neutral-content">{beatmapDataWithAttributes.creator}</b></a></div>
+                            <div className="col-span-4">
+                                <a href={beatmapDataWithAttributes.url} className="font-bold"><p className="truncate">{beatmapDataWithAttributes.title}</p></a>
+                                <div className="label-text text-xs text-zinc-500">difficulty <b className="text-neutral-content">{beatmapDataWithAttributes.difficulty}</b> artist <b className="text-neutral-content">{beatmapDataWithAttributes.artist}</b> <a href={"https://osu.ppy.sh/u/" + beatmapDataWithAttributes.creator_id}>mapper <b className="text-neutral-content">{beatmapDataWithAttributes.creator}</b></a></div>
                             </div>
-                            <div className="flex flex-col items-end justify-center text-xs">
-                                <div className="flex gap-1"><p>drain</p><p className=" font-bold">4:04</p></div>
+                            <div className="flex flex-col items-end justify-center text-xs col-span-2">
+                                <div className="flex gap-1"><p>length</p><p className=" font-bold">{formatTime(attributes.hit_length)}</p></div>
                                 <div className="flex gap-2">
-                                    <div className="flex flex-row gap-1"><p>ar</p><p className=" font-bold">{beatmapDataWithAttributes.attributes.approachRate}</p></div>
-                                    <div className="flex flex-row gap-1"><p>cs</p><p className=" font-bold">4</p></div>
-                                    <div className="flex flex-row gap-1"><p>od</p><p className=" font-bold">{beatmapDataWithAttributes.attributes.overallDifficulty}</p></div>
-                                    <div className="flex flex-row gap-1"><p>hp</p><p className=" font-bold">{beatmapDataWithAttributes.drain}</p></div>
+                                    <div className="flex flex-row gap-1"><p>ar</p><p className=" font-bold">{attributes.ar}</p></div>
+                                    <div className="flex flex-row gap-1"><p>cs</p><p className=" font-bold">{attributes.cs}</p></div>
+                                    <div className="flex flex-row gap-1"><p>od</p><p className=" font-bold">{attributes.od}</p></div>
+                                    <div className="flex flex-row gap-1"><p>hp</p><p className=" font-bold">{attributes.hp}</p></div>
                                 </div>
                             </div>
                         </div>

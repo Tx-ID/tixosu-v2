@@ -121,7 +121,7 @@ export default function card({ round, onRoundUpdate, onRoundDelete, isDeleting,
                             onBeatmapUpdate={handleMapUpdate}
                             onBeatmapDelete={handleMapDelete}
 
-                            beatmapDataWithAttributes={...beatmapsWithAttributes.filter(bm => bm.id === beatmap.beatmap_id && bm.mods === beatmap.mods)[0]}
+                            beatmapDataWithAttributes={...beatmapsWithAttributes.filter(bm => (bm.id === beatmap.beatmap_id && bm.mods === beatmap.mods))[0]}
                         />
                     ))}
                 </ReactSortable>

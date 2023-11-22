@@ -22,10 +22,10 @@ export default function Template({ children, session }) {
     // ["Authorization", "/admin/authorization"],
     // ["Sheets", "/admin/sheets"],
     ["Players", "/admin/registered"],
-    ["Teams", "/admin/teams"],
+    // ["Teams", "/admin/teams"],
     ["Rounds", "/admin/rounds"],
     ["Timeline", '/admin/timeline'],
-    ["Matches", "/admin/matches"],
+    // ["Matches", "/admin/matches"],
     ["Settings", "/admin/settings"],
   ]
 
