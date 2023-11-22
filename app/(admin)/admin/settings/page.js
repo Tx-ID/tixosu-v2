@@ -31,8 +31,19 @@ export default function page() {
 
     const setRoundVisible = useMutation({
         mutationKey: ["rounds_visible"],
-        mutationFn: async () => {
+        mutationFn: async (event) => {
+            const element = event.target
+            const id = parseInt(element.name)
+            const new_checked_value = !element.checked
 
+            const response = await axios.post(`/api/rounds/${id}/visible`, {
+                visible: new_checked_value === true,
+            })
+            if (response.status !== 200)
+                throw new Error("Failed to set visible of a round!")
+
+            queryRounds.refetch();
+            return { id: id, checked: new_checked_value };
         },
     })
 
@@ -57,7 +68,7 @@ export default function page() {
                     <tbody>
                         {queryRounds.isLoading
                             ? <tr key={"loading"} className="border-b-0 bg-dark">
-                                <td colSpan="6" className="w-96"><span className="loading loading-spinner h-8"></span></td>
+                                <td colSpan="6"><span className="loading loading-spinner h-8"></span></td>
                             </tr>
                             : queryRounds.isError
                                 ? <tr key={"error"} className="border-b-0 bg-dark">
@@ -77,7 +88,7 @@ export default function page() {
                                             <td>{round.name}</td>
                                             <td>
                                                 <div className="form-control flex justify-center flex-row">
-                                                    <input type="checkbox" checked={round.visible} className="checkbox w-6 h-6" onChange={() => { }} />
+                                                    <input name={round.id} type="checkbox" checked={round.visible} className="checkbox w-6 h-6" onChange={(e) => setRoundVisible.mutate(e)} />
                                                 </div>
                                             </td>
                                         </tr>
