@@ -17,7 +17,7 @@ export async function POST(req, { params }) {
 
     const client = turso.create();
     const get_rounds = await rounds.getRounds(client);
-    get_rounds.forEach(async (round, index) => {
+    await get_rounds.forEach(async (round, index) => {
         if (round.id === parseInt(roundId)) {
             await rounds.setRoundData(client, {
                 ...round,
