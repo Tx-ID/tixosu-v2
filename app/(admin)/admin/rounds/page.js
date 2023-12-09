@@ -8,7 +8,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import RoundCard from "./card"
-import { updateRoundBeatmaps } from "@/lib/rounds";
 
 export default function roundsPage() {
 
