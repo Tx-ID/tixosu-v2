@@ -1,14 +1,14 @@
 export const revalidate = 0;
 
 import { NextResponse } from "next/server";
-import * as rounds from "@/lib/rounds";
-import * as turso from "@/lib/turso";
+import * as Rounds from "@/lib/rounds";
+import * as Turso from "@/lib/turso";
 
 // return all rounds
 export async function GET(req) {
-    const client = turso.create();
-    const get_rounds = await rounds.getRounds(client);
+    const client = Turso.create();
+    const rounds = await Rounds.getRounds(client);
     client.close();
 
-    return NextResponse.json(get_rounds);
+    return NextResponse.json(rounds);
 }
