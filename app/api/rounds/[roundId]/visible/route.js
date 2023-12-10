@@ -16,15 +16,7 @@ export async function POST(req, { params }) {
         return new NextResponse('"Unauthorized"', { status: 401 });
 
     const client = turso.create();
-    const get_rounds = await rounds.getRounds(client);
-    await get_rounds.forEach(async (round, index) => {
-        if (round.id === parseInt(roundId)) {
-            await rounds.setRoundData(client, {
-                ...round,
-                visible: data.visible === true,
-            })
-        }
-    })
+    await rounds.setRoundVisible(client, roundId, true)
     client.close();
 
     return NextResponse.json({ message: DateTime.now().toISO() })
