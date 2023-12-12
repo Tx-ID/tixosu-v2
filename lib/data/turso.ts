@@ -200,7 +200,7 @@ export async function getTimelineEvents(
   turso: Client
 ): Promise<TimelineEvent[]> {
   const result = await turso.execute(
-    "SELECT id, name, start_time AS start, end_time AS end, FROM `timeline_event` ORDER BY start_time"
+    "SELECT id, name, start_time AS start, end_time AS end FROM `timeline_event` ORDER BY start_time"
   );
   return z
     .array(timelineEventBaseSchema)
