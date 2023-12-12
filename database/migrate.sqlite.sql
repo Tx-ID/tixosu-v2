@@ -84,12 +84,12 @@ CREATE TABLE `match_ban` (
 );
 
 CREATE TABLE `round_beatmap` (
-    `id` INTEGER NOT NULL PRIMARY KEY,
-    `zindex` INTEGER NOT NULL,
-    `number` INTEGER NOT NULL,
-    `mod` TEXT NOT NULL,
     `round_id` INTEGER NOT NULL,
-    `beatmap_id` INTEGER NOT NULL
+    `zindex` INTEGER NOT NULL,
+    `beatmap_id` INTEGER NOT NULL,
+    `mod` TEXT NOT NULL,
+    `label` TEXT NOT NULL,
+    PRIMARY KEY (`round_id`, `zindex`)
 );
 
 -- CACHE PROFILE_0
