@@ -11,6 +11,8 @@ import {
   Round,
   RoundWithBeatmaps,
   RoundBeatmap,
+  TimelineEvent,
+  timelineEventBaseSchema,
 } from "./models";
 
 const config = {
@@ -164,18 +166,6 @@ export async function userIsAdmin(
   return result?.rows[0]?.isadmin === 1;
 }
 
-const timelineEventBaseSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  start: z.string(),
-  end: z.string(),
-});
-
-type TimelineEvent = z.mergeTypes<
-  z.infer<typeof timelineEventBaseSchema>,
-  { start: DateTime; end: DateTime }
->;
-
 export async function getTimelineEvent(
   turso: Client,
   id: string
@@ -188,12 +178,7 @@ export async function getTimelineEvent(
   if (row === undefined) {
     return null;
   }
-  const parsed = timelineEventBaseSchema.parse(row);
-  return {
-    ...parsed,
-    start: DateTime.fromISO(parsed.start),
-    end: DateTime.fromISO(parsed.end),
-  };
+  return timelineEventBaseSchema.parse(row);
 }
 
 export async function getTimelineEvents(
@@ -202,14 +187,7 @@ export async function getTimelineEvents(
   const result = await turso.execute(
     "SELECT id, name, start_time AS start, end_time AS end FROM `timeline_event` ORDER BY start_time"
   );
-  return z
-    .array(timelineEventBaseSchema)
-    .parse(result.rows)
-    .map((row) => ({
-      ...row,
-      start: DateTime.fromISO(row.start),
-      end: DateTime.fromISO(row.end),
-    }));
+  return z.array(timelineEventBaseSchema).parse(result.rows);
 }
 
 export async function overrideTimelineEvent(
@@ -284,7 +262,7 @@ export async function getRounds(turso: Client): Promise<RoundWithBeatmaps[]> {
       id: roundRows[0]!!.id,
       zindex: roundRows[0]!!.zindex,
       name: roundRows[0]!!.name,
-      date: DateTime.fromISO(roundRows[0]!!.date),
+      date: roundRows[0]!!.date,
       bestOf: roundRows[0]!!.bestOf,
       visible: roundRows[0]!!.visible,
       beatmaps:
@@ -333,7 +311,7 @@ export async function getRound(
     id: first.id,
     zindex: first.zindex,
     name: first.name,
-    date: DateTime.fromISO(first.date),
+    date: first.date,
     bestOf: first.bestOf,
     visible: first.visible,
     beatmaps:
@@ -395,11 +373,7 @@ export async function createRound(
     if (insertedRound === undefined) {
       throw new Error("Something went wrong creating the round");
     }
-    const parsed = roundBaseSchema.parse(insertedRound);
-    return {
-      ...parsed,
-      date: DateTime.fromISO(parsed.date),
-    };
+    return roundBaseSchema.parse(insertedRound);
   } catch (error) {
     await t.rollback();
     throw error;

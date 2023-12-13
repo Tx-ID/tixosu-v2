@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as Beatmap from "@/lib/beatmap";
-import * as Osu from "@/lib/osu";
+import * as Osu from "@/lib/data/osu";
 import * as Turso from "@/lib/data/turso";
 import * as Upstash from "@/lib/upstash";
 
