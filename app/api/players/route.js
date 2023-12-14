@@ -3,7 +3,7 @@ import * as auth from "@/lib/auth.js";
 import { NextResponse } from "next/server";
 import { getRegisteredPlayers } from "@/lib/players";
 import * as Turso from "@/lib/data/turso";
-import * as Upstash from "@/lib/upstash";
+import * as Upstash from "@/lib/data/upstash";
 
 export async function GET(req) {
   const session = await getServerSession(auth.config);

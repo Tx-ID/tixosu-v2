@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 import * as Players from "@/lib/players";
 import * as Turso from "@/lib/data/turso";
-import * as Upstash from "@/lib/upstash";
+import * as Upstash from "@/lib/data/upstash";
 
 export async function POST(req, { params }) {
   const { id } = params;

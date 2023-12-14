@@ -1,5 +1,5 @@
 import * as Turso from "@/lib/data/turso";
-import * as Upstash from "@/lib/upstash";
+import * as Upstash from "@/lib/data/upstash";
 import * as Players from "@/lib/players";
 import { getServerSession } from "next-auth";
 import * as auth from "@/lib/auth";

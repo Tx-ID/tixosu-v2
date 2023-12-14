@@ -7,7 +7,7 @@ import * as rounds from "@/lib/rounds";
 import { parseMods } from "@/lib/beatmap";
 
 import * as turso from "@/lib/data/turso";
-import * as upstash from "@/lib/upstash";
+import * as upstash from "@/lib/data/upstash";
 
 export async function POST(req, { params }) {
   const session = await getUserSession();
