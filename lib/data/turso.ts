@@ -218,11 +218,11 @@ export async function removeTimelineEvent(
 
 const roundBeatmapJoinSchema = roundBaseSchema.merge(
   z.object({
-    beatmap_roundId: z.number().int(),
-    beatmap_zindex: z.number().int(),
-    beatmap_beatmapId: z.number().int(),
-    beatmap_mod: z.string(),
-    beatmap_label: z.string(),
+    beatmap_roundId: z.number().int().nullable(),
+    beatmap_zindex: z.number().int().nullable(),
+    beatmap_beatmapId: z.number().int().nullable(),
+    beatmap_mod: z.string().nullable(),
+    beatmap_label: z.string().nullable(),
   })
 );
 
@@ -269,10 +269,10 @@ export async function getRounds(turso: Client): Promise<RoundWithBeatmaps[]> {
         roundRows[0]!!.beatmap_roundId === null
           ? []
           : roundRows.map((row) => ({
-              zindex: row.beatmap_zindex,
-              beatmapId: row.beatmap_beatmapId,
-              mod: row.beatmap_mod,
-              label: row.beatmap_label,
+              zindex: row.beatmap_zindex!!,
+              beatmapId: row.beatmap_beatmapId!!,
+              mod: row.beatmap_mod!!,
+              label: row.beatmap_label!!,
             })),
     })
   );
@@ -318,10 +318,10 @@ export async function getRound(
       first.beatmap_roundId === null
         ? []
         : parsedResults.map((row) => ({
-            zindex: row.beatmap_zindex,
-            beatmapId: row.beatmap_beatmapId,
-            mod: row.beatmap_mod,
-            label: row.beatmap_label,
+            zindex: row.beatmap_zindex!!,
+            beatmapId: row.beatmap_beatmapId!!,
+            mod: row.beatmap_mod!!,
+            label: row.beatmap_label!!,
           })),
   };
 }
@@ -342,17 +342,14 @@ export async function createRound(
 ): Promise<Round> {
   const t = await turso.transaction("write");
   try {
+    const getLastZindex = await t.execute(
+      `SELECT zindex FROM round ORDER BY zindex DESC LIMIT 1`
+    );
     const lastZindex = z
       .number()
       .int()
-      .parse(
-        (
-          await turso.execute(
-            `SELECT zindex FROM round ORDER BY zindex DESC LIMIT 1`
-          )
-        ).rows[0]?.id ?? 0
-      );
-    const insertResult = await turso.execute({
+      .parse(getLastZindex.rows[0]?.id ?? 0);
+    const insertResult = await t.execute({
       sql: `
                 INSERT INTO \`round\` (zindex, name, date, best_of, visible) 
                 VALUES (:zindex, :name, :date, :best_of, :visible)`,
@@ -365,14 +362,15 @@ export async function createRound(
       },
     });
     const insertedId = insertResult.lastInsertRowid!!;
-    const fetchRoundResult = await turso.execute({
-      sql: "SELECT id, zindex, name, date, bestOf, visible FROM round WHERE id = ?",
+    const fetchRoundResult = await t.execute({
+      sql: "SELECT id, zindex, name, date, best_Of AS bestOf, visible FROM round WHERE id = ?",
       args: [insertedId],
     });
     const insertedRound = fetchRoundResult.rows[0];
     if (insertedRound === undefined) {
       throw new Error("Something went wrong creating the round");
     }
+    await t.commit();
     return roundBaseSchema.parse(insertedRound);
   } catch (error) {
     await t.rollback();

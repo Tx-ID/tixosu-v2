@@ -6,16 +6,15 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import {
-  RoundBeatmap,
   roundBaseSchema,
   roundBeatmapSchema,
+  beatmapWithDifficultyAttributeSetSchema,
+  type RoundBeatmap,
+  type BeatmapDifficultyAttributeSet,
 } from "@/lib/data/models";
 import { DateTime } from "luxon";
 import _ from "lodash";
-import {
-  BeatmapDifficultyAttributes,
-  BeatmapWithDifficultyAttributes,
-} from "@/lib/data/osu";
+import axios from "axios";
 
 const beatmapWithRoundsResponseSchema = z.intersection(
   roundBaseSchema,
@@ -29,11 +28,12 @@ type LocalBeatmap = z.mergeTypes<
   {
     localId: number; // internal ID to identify on the UI
     zindex?: undefined;
+    beatmapId: number | undefined;
   }
 >;
 type LocalBeatmapWithAttributes = z.mergeTypes<
   LocalBeatmap,
-  BeatmapDifficultyAttributes
+  BeatmapDifficultyAttributeSet
 >;
 type LocalRound = z.mergeTypes<
   BeatmapWithRoundsResponse,
@@ -53,6 +53,23 @@ type BeatmapCardProps = {
   onDelete: () => void;
 };
 function BeatmapCard({ beatmap, index, onUpdate, onDelete }: BeatmapCardProps) {
+  const {
+    data: beatmapDetails,
+    status,
+    error,
+  } = useQuery({
+    queryKey: [beatmap.beatmapId, beatmap.mod],
+    queryFn: async () => {
+      const response = await axios.get(
+        `/api/beatmaps/${beatmap.beatmapId}/${beatmap.mod}`
+      );
+      const data = beatmapWithDifficultyAttributeSetSchema.parse(response.data);
+      return data;
+    },
+    enabled: beatmap.beatmapId !== undefined,
+    keepPreviousData: true,
+  });
+
   const colorMap: Record<string, { bg: string; border: string }> = {
     nm: {
       bg: "bg-nomod",
@@ -125,23 +142,26 @@ function BeatmapCard({ beatmap, index, onUpdate, onDelete }: BeatmapCardProps) {
         </svg>
         <div className="flex flex-col col-span-2">
           <label className="label-text text-xs">Mods</label>
+          <select
+            className="select select-bordered select-sm w-full max-w-xs"
+            onChange={(e) => onUpdate({ ...beatmap, mod: e.target.value })}
+          >
+            {Object.keys(colorMap)
+              .map((str) => str.toUpperCase())
+              .map((mod) => (
+                <option key={mod} value={mod}>
+                  {mod}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div className="flex flex-col col-span-2">
+          <label className="label-text text-xs">Label</label>
           <input
             type="text"
             className="input input-bordered input-sm"
-            value={beatmap.mod}
-            onChange={(e) =>
-              onUpdate({
-                ...beatmap,
-                mod: e.target.value,
-              })
-            }
-          ></input>
-        </div>
-        <div className="flex flex-col col-span-2">
-          <label className="label-text text-xs">Number</label>
-          <input
-            type="number"
-            className="input input-bordered input-sm"
+            value={beatmap.label}
+            onChange={(e) => onUpdate({ ...beatmap, label: e.target.value })}
           ></input>
         </div>
         <div className="flex flex-col col-span-3">
@@ -150,15 +170,89 @@ function BeatmapCard({ beatmap, index, onUpdate, onDelete }: BeatmapCardProps) {
             type="number"
             className="input input-bordered input-sm"
             value={beatmap.beatmapId}
-            onChange={(e) =>
-              onUpdate({ ...beatmap, beatmapId: parseInt(e.target.value) })
-            }
+            onChange={(e) => {
+              try {
+                const value = parseInt(e.target.value);
+                onUpdate({ ...beatmap, beatmapId: value });
+              } catch (_) {}
+            }}
           ></input>
         </div>
         <div className="flex flex-col col-span-15">
-          <span className="h-16">
-            <p className="opacity-0">invisible label</p>
-          </span>
+          {status !== "success" ? (
+            <span className="h-16">
+              <p className="opacity-0"></p>
+            </span>
+          ) : (
+            <div className="flex flex-col justify-center px-2 relative col-span-15 h-16">
+              <div className="grid grid-cols-6 z-10">
+                <div className="col-span-4">
+                  <a href={beatmapDetails.url} className="font-bold">
+                    <p className="truncate">{beatmapDetails.title}</p>
+                  </a>
+                  <div className="label-text text-xs text-zinc-500">
+                    difficulty{" "}
+                    <b className="text-neutral-content">
+                      {beatmapDetails.difficulty}
+                    </b>{" "}
+                    artist{" "}
+                    <b className="text-neutral-content">
+                      {beatmapDetails.artist}
+                    </b>{" "}
+                    <a
+                      href={"https://osu.ppy.sh/u/" + beatmapDetails.creatorId}
+                    >
+                      mapper{" "}
+                      <b className="text-neutral-content">
+                        {beatmapDetails.creator}
+                      </b>
+                    </a>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end justify-center text-xs col-span-2">
+                  <div className="flex gap-1">
+                    <p>length</p>
+                    <p className=" font-bold">
+                      {formatTime(beatmapDetails.attributes.hitLength)}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex flex-row gap-1">
+                      <p>ar</p>
+                      <p className=" font-bold">
+                        {beatmapDetails.attributes.ar}
+                      </p>
+                    </div>
+                    <div className="flex flex-row gap-1">
+                      <p>cs</p>
+                      <p className=" font-bold">
+                        {beatmapDetails.attributes.cs}
+                      </p>
+                    </div>
+                    <div className="flex flex-row gap-1">
+                      <p>od</p>
+                      <p className=" font-bold">
+                        {beatmapDetails.attributes.od}
+                      </p>
+                    </div>
+                    <div className="flex flex-row gap-1">
+                      <p>hp</p>
+                      <p className=" font-bold">
+                        {beatmapDetails.attributes.hp}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute left-0 top-0 w-full h-full z-0">
+                <img
+                  className="h-full w-full object-cover brightness-[20%]"
+                  src={beatmapDetails.covers.cover}
+                ></img>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex items-center">
           <button onClick={() => onDelete()} className="btn btn-neutral btn-sm">
@@ -196,7 +290,7 @@ function RoundCard({ round, index, onUpdate, onDelete }: RoundCardProps) {
         .map((e) => e.localId)
         .reduce((max, next) => (next > max ? next : max), 0) + 1,
     zindex: undefined,
-    beatmapId: 0,
+    beatmapId: undefined,
     mod: "NM",
     label: "NM1",
   });
@@ -342,7 +436,7 @@ export default function () {
           ...round,
           localId: round.id,
           zindex: undefined,
-          date: DateTime.fromISO(round.date),
+          date: round.date,
           beatmaps: round.beatmaps
             .sort((a, b) => a.zindex - b.zindex)
             .map((beatmap, idx) => ({
@@ -353,11 +447,29 @@ export default function () {
         }));
 
       setLocalRounds(transformed);
+      setIsDirty(false);
       return transformed;
     },
   });
 
-  const saveChangesMutation = useMutation({});
+  const saveChangesMutation = useMutation({
+    mutationFn: async (rounds: LocalRound[]) => {
+      const transformed = rounds.map((round, idx) => ({
+        ...round,
+        zindex: idx,
+        beatmaps: round.beatmaps.map((roundBeatmap, idx) => ({
+          ...roundBeatmap,
+          zindex: idx,
+          beatmapId: roundBeatmap.beatmapId ?? 0,
+        })),
+      }));
+      const response = await axios.post("/api/rounds/overwrite", {
+        rounds: transformed,
+      });
+      return response;
+    },
+    onSettled: () => getRoundsQuery.refetch(),
+  });
 
   const [localRounds, setLocalRounds] = useState<LocalRound[]>([]);
   const [isDirty, setIsDirty] = useState<boolean>(false);
@@ -398,6 +510,7 @@ export default function () {
             disabled={getRoundsQuery.status !== "success"}
             onClick={() => {
               setLocalRounds([...localRounds, createRound()]);
+              setIsDirty(true);
             }}
           >
             add round
@@ -440,29 +553,42 @@ export default function () {
               key={round.localId}
               round={round}
               index={roundIndex}
-              onUpdate={(newData) =>
+              onUpdate={(newData) => {
                 setLocalRounds([
                   ...localRounds.slice(0, roundIndex),
                   newData,
                   ...localRounds.slice(roundIndex + 1),
-                ])
-              }
-              onDelete={() =>
+                ]);
+                setIsDirty(true);
+              }}
+              onDelete={() => {
                 setLocalRounds([
                   ...localRounds.slice(0, roundIndex),
                   ...localRounds.slice(roundIndex + 1),
-                ])
-              }
+                ]);
+                setIsDirty(true);
+              }}
             />
           ))}
         </ReactSortable>
       )}
       <div className="absolute bottom-5 right-0">
-        <button className={"btn btn-disabled"}>
-          <span className="loading loading-spinner"></span>
+        <button
+          className={
+            "btn " +
+            (isDirty && saveChangesMutation.status !== "loading"
+              ? "btn-primary"
+              : "btn-disabled")
+          }
+          onClick={(e) => saveChangesMutation.mutate(localRounds)}
+        >
+          {saveChangesMutation.status === "loading" ? (
+            <span className="loading loading-spinner"></span>
+          ) : (
+            "SAVE CHANGES"
+          )}
         </button>
       </div>
-      <div>{JSON.stringify(localRounds)}</div>
     </div>
   );
 }

@@ -54,13 +54,15 @@ export const roundBeatmapSchema = z.object({
   label: z.string(),
 });
 
+export const roundWithBeatmapsSchema = roundBaseSchema.merge(
+  z.object({ beatmaps: z.array(roundBeatmapSchema) })
+);
+
 export type Round = z.infer<typeof roundBaseSchema>;
 
 export type RoundBeatmap = z.infer<typeof roundBeatmapSchema>;
 
-export type RoundWithBeatmaps = Round & {
-  beatmaps: RoundBeatmap[];
-};
+export type RoundWithBeatmaps = z.infer<typeof roundWithBeatmapsSchema>;
 
 export const beatmapSchema = z.object({
   id: z.coerce.number(),
@@ -116,13 +118,16 @@ export const beatmapDifficultyAttributeSetSchema = z.object({
   }),
 });
 
+export const beatmapWithDifficultyAttributeSetSchema = beatmapSchema.merge(
+  beatmapDifficultyAttributeSetSchema
+);
+
 export type Beatmap = z.infer<typeof beatmapSchema>;
 
 export type BeatmapDifficultyAttributeSet = z.infer<
   typeof beatmapDifficultyAttributeSetSchema
 >;
 
-export type BeatmapWithDifficultyAttributeSet = z.mergeTypes<
-  Beatmap,
-  BeatmapDifficultyAttributeSet
+export type BeatmapWithDifficultyAttributeSet = z.infer<
+  typeof beatmapDifficultyAttributeSetSchema
 >;
