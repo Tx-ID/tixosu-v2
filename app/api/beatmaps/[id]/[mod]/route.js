@@ -19,6 +19,12 @@ export async function GET(req, { params: { id, mod } }) {
     mod
   );
 
+  if (result === null) {
+    return new NextResponse("Beatmap not found", {
+      status: 404,
+    });
+  }
+
   turso.close();
 
   return NextResponse.json(result);
