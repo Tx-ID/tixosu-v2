@@ -34,12 +34,17 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
+    "@types/lodash": "^4.14.202",
+    "@types/luxon": "^3.3.7",
+    "@types/node": "^20.10.4",
+    "@types/react": "^18.2.43",
     "@types/sortablejs": "^1.15.4",
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.8.3",
     "dependency-cruiser": "^15.0.0",
     "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.3.3"
   },
   "volta": {
     "node": "20.10.0"
