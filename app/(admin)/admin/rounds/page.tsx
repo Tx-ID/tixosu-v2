@@ -145,6 +145,7 @@ function BeatmapCard({ beatmap, index, onUpdate, onDelete }: BeatmapCardProps) {
           <select
             className="select select-bordered select-sm w-full max-w-xs"
             onChange={(e) => onUpdate({ ...beatmap, mod: e.target.value })}
+            value={beatmap.mod}
           >
             {Object.keys(colorMap)
               .map((str) => str.toUpperCase())
@@ -295,6 +296,11 @@ function RoundCard({ round, index, onUpdate, onDelete }: RoundCardProps) {
     label: "NM1",
   });
 
+  const beatmapListForSortable = round.beatmaps.map((e) => ({
+    ...e,
+    id: e.localId,
+  }));
+
   return (
     <div
       className={
@@ -383,8 +389,19 @@ function RoundCard({ round, index, onUpdate, onDelete }: RoundCardProps) {
         <div className="bg-dark w-full p-4">
           <ReactSortable
             className="flex gap-1 flex-col"
-            list={round.beatmaps.map((e) => ({ ...e, id: e.localId }))}
-            setList={(list) => onUpdate({ ...round, beatmaps: list })}
+            list={beatmapListForSortable}
+            setList={(list) => {
+              const listOrderChanged =
+                list.length !== beatmapListForSortable.length ||
+                beatmapListForSortable.some((val, idx) => {
+                  const eq = list[idx];
+                  return eq === undefined || eq.id !== val.id;
+                });
+              if (!listOrderChanged) {
+                return;
+              }
+              onUpdate({ ...round, beatmaps: list });
+            }}
             animation={150}
             fallbackOnBody
             swapThreshold={0.65}
@@ -395,7 +412,7 @@ function RoundCard({ round, index, onUpdate, onDelete }: RoundCardProps) {
               <BeatmapCard
                 key={beatmap.localId}
                 beatmap={beatmap}
-                onUpdate={(newBeatmap) =>
+                onUpdate={(newBeatmap) => {
                   onUpdate({
                     ...round,
                     beatmaps: [
@@ -403,17 +420,17 @@ function RoundCard({ round, index, onUpdate, onDelete }: RoundCardProps) {
                       newBeatmap,
                       ...round.beatmaps.slice(roundBeatmapIndex + 1),
                     ],
-                  })
-                }
-                onDelete={() =>
+                  });
+                }}
+                onDelete={() => {
                   onUpdate({
                     ...round,
                     beatmaps: [
                       ...round.beatmaps.slice(0, roundBeatmapIndex),
                       ...round.beatmaps.slice(roundBeatmapIndex + 1),
                     ],
-                  })
-                }
+                  });
+                }}
               />
             ))}
           </ReactSortable>
@@ -443,6 +460,7 @@ export default function () {
               ...beatmap,
               localId: idx,
               zindex: undefined,
+              mod: beatmap.mod.toUpperCase(),
             })),
         }));
 
@@ -489,6 +507,12 @@ export default function () {
     visible: true,
     beatmaps: [],
   });
+
+  const roundsListForSortable = localRounds.map((round) => ({
+    ...round,
+    id: round.localId,
+    _id: round.id,
+  }));
 
   useEffect(() => {
     resetLocalState();
@@ -537,13 +561,19 @@ export default function () {
       ) : (
         <ReactSortable
           className="flex gap-2 flex-col pb-20"
-          list={localRounds.map((round) => ({
-            ...round,
-            id: round.name,
-            _id: round.id,
-          }))}
+          list={roundsListForSortable}
           setList={(list) => {
+            const listOrderChanged =
+              list.length !== roundsListForSortable.length ||
+              roundsListForSortable.some((val, idx) => {
+                const eq = list[idx];
+                return eq === undefined || eq.id !== val.id;
+              });
+            if (!listOrderChanged) {
+              return;
+            }
             setLocalRounds(list.map((e) => ({ ...e, id: e._id })));
+            setIsDirty(true);
           }}
           animation={150}
           handle=".round-dragger"
@@ -573,21 +603,39 @@ export default function () {
         </ReactSortable>
       )}
       <div className="absolute bottom-5 right-0">
-        <button
-          className={
-            "btn " +
-            (isDirty && saveChangesMutation.status !== "loading"
-              ? "btn-primary"
-              : "btn-disabled")
-          }
-          onClick={(e) => saveChangesMutation.mutate(localRounds)}
-        >
-          {saveChangesMutation.status === "loading" ? (
-            <span className="loading loading-spinner"></span>
-          ) : (
-            "SAVE CHANGES"
-          )}
-        </button>
+        <div className="flex flex-row gap-5">
+          <button
+            className={
+              "btn w-40 " +
+              (isDirty && saveChangesMutation.status !== "loading"
+                ? "btn-primary"
+                : "btn-disabled")
+            }
+            onClick={(e) => resetLocalState()}
+          >
+            {saveChangesMutation.status === "loading" ||
+            getRoundsQuery.status === "loading" ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              `RESET`
+            )}
+          </button>
+          <button
+            className={
+              "btn w-40 " +
+              (isDirty && saveChangesMutation.status !== "loading"
+                ? "btn-primary"
+                : "btn-disabled")
+            }
+            onClick={(e) => saveChangesMutation.mutate(localRounds)}
+          >
+            {saveChangesMutation.status === "loading" ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              "SAVE CHANGES"
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
