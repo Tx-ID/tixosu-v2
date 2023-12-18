@@ -32,7 +32,9 @@ CREATE TABLE `participant` (
 CREATE TABLE `team` (
     `id` INTEGER PRIMARY KEY,
     `name` TEXT NOT NULL,
-    `icon_url` TEXT DEFAULT NULL
+    `index` INTEGER NOT NULL,
+    `icon_url` TEXT DEFAULT NULL,
+    `visible` BOOLEAN NOT NULL DEFAULT true
 );
 
 CREATE TABLE `round` (

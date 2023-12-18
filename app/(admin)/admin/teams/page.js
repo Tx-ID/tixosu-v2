@@ -3,16 +3,28 @@
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 
-import { useEffect, useState } from "react";
 import { ReactSortable } from "react-sortablejs";
+import Modal from "@/app/(admin)/modal";
+
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
+
+function playerCard({ key, index, localMember, onUpdate, onDelete, participants, overlappingParticipants }) {
+
+}
+
+function teamCard({ key, index, localTeam, onUpdate, onDelete, participants, overlappingParticipants }) {
+
+}
 
 export default function page() {
 
     // member: {osu_id: number, index: number}
     // team: {id: number, name: string, index: number, members: [member, ...]}
     // teams: [team, ...]
+
+    const [lastTeams, setLastTeams] = useState([]);
     const [localTeams, setLocalTeams] = useState([]);
     const [canSave, setCanSave] = useState(false);
 
@@ -73,11 +85,22 @@ export default function page() {
                 {isLoading
                     ? <span className="loading loading-spinner h-8"></span>
                     : <div>
-                        insert new sortable for teams
+                        <ReactSortable
+                            className="flex gap-1 flex-col"
+                            animation={150}
+                            fallbackOnBody
+                            swapThreshold={0.65}
+                            direction={"vertical"}
+                            handle=".map-dragger"
+
+                            list={[]}
+                            setList={(list) => { }}
+                        >
+
+                        </ReactSortable>
                     </div>
                 }
             </div>
-
         </div>
     )
 }
