@@ -69,7 +69,7 @@ export default function Home() {
 
   return (
     <div className="mx-2 flex flex-col items-start">
-      <img className="w-full" src="https://cdn.discordapp.com/attachments/856213034716758036/1158702564141973534/IMG_3414.JPG?ex=651d355a&is=651be3da&hm=89d37764da8debf72db294ea8fc268e650301a76912d7966280fa016eced23c8&"></img>
+      <img className="w-full" src="https://cdn.gilcdn.com/ContentMediaGenericFiles/82a932127b036953af37baa6a312bf79-Full.webp"></img>
       <div className="w-full flex flex-col md:flex-row mt-4">
         <div className="overflow-x-auto">
           <table className="table w-fit max-w-md">
