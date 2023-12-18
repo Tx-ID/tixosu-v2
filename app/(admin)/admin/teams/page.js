@@ -10,22 +10,35 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-function playerCard({ key, index, localMember, onUpdate, onDelete, participants, overlappingParticipants }) {
+function PlayerCard({ key, index, localMember, onUpdate, onDelete, participants, overlappingParticipants }) {
 
 }
 
-function teamCard({ key, index, localTeam, onUpdate, onDelete, participants, overlappingParticipants }) {
-
+function TeamCard({ key, index, localTeam, onUpdate, onDelete, participants, overlappingParticipants }) {
+    return (<div>
+        <p>{localTeam.name}</p>
+    </div>)
 }
 
 export default function page() {
 
     // member: {osu_id: number, index: number}
     // team: {id: number, name: string, index: number, members: [member, ...]}
-    // teams: [team, ...]
-
     const [lastTeams, setLastTeams] = useState([]);
     const [localTeams, setLocalTeams] = useState([]);
+
+    function newLocalTeam() {
+        return {
+            id: undefined,
+            index: undefined,
+            name: "New Team",
+            visible: true,
+            members: [],
+
+            _id: Math.max(localTeams.map((e) => e._id) ?? 0) + 1,
+        }
+    }
+
     const [canSave, setCanSave] = useState(false);
 
     // participantIds: {number, ...}
@@ -58,9 +71,15 @@ export default function page() {
         queryFn: async () => {
             return [];
         },
+
+        refetchOnWindowFocus: false,
     });
 
     const isLoading = getTeamsQuery.isLoading || getParticipantsQuery.isLoading;
+    const teamsSortable = localTeams.map((e) => ({
+        ...e,
+        _id: e.id,
+    }))
 
     return (
         <div className="overflow-auto">
@@ -69,7 +88,10 @@ export default function page() {
                 <div className="flex flex-row gap-2">
                     <button
                         className={"btn btn-neutral btn-xs w-fit" + (isLoading ? " btn-disabled" : "")}
-                        onClick={() => { }}
+                        onClick={() => {
+                            setLocalTeams([...localTeams, newLocalTeam()]);
+                            setCanSave(true);
+                        }}
                     >
                         new team
                     </button>
@@ -93,10 +115,32 @@ export default function page() {
                             direction={"vertical"}
                             handle=".map-dragger"
 
-                            list={[]}
-                            setList={(list) => { }}
-                        >
+                            list={teamsSortable}
+                            setList={(list) => {
+                                const changed = teamsSortable.some((value, index) => {
+                                    const eq = list[index];
+                                    return eq === undefined || eq.id !== value.id;
+                                })
+                                if (!changed)
+                                    return;
 
+                                setLocalTeams(
+                                    list.map((e) => ({ ...e, id: e._id }))
+                                );
+                                setCanSave(true);
+                            }}
+                        >
+                            {localTeams.map((localTeam, index) => (
+                                <TeamCard
+                                    key={localTeam._id}
+                                    index={index}
+                                    localTeam={localTeam}
+                                    onUpdate={() => { }}
+                                    onDelete={() => { }}
+                                    participants={getParticipantsQuery?.data ?? []}
+                                    overlappingParticipants={overlappingParticipants}
+                                />
+                            ))}
                         </ReactSortable>
                     </div>
                 }
