@@ -6,13 +6,30 @@ import * as zodExt from "@/lib/util/zodExt";
  * @module models
  * */
 
+export const osuPlayerProfileSchema = z.object({
+  id: z.number().int(),
+  avatarUrl: z.string(),
+  username: z.string(),
+  rank: z.number().nullable(),
+  countryCode: z.string(),
+});
+
 export const participantBaseSchema = z.object({
   osuId: z.number().int(),
   teamId: z.number().int().nullable(),
   visible: z.coerce.boolean(),
 });
 
+export const participantPublicDataBaseSchema = z.object({
+  teamId: z.number().int().nullable(),
+  profile: osuPlayerProfileSchema,
+});
+
 export type Participant = z.infer<typeof participantBaseSchema>;
+
+export type ParticipantPublicData = z.infer<
+  typeof participantPublicDataBaseSchema
+>;
 
 export const teamBaseSchema = z.object({
   id: z.number().int(),
